@@ -24,8 +24,8 @@ idt_set:
  [GLOBAL isr%1]        ; %1 accesses the first parameter.
  isr%1:
    cli
-   push byte 0
-   push byte %1
+   push 0
+   push %1
    jmp isr_common_stub
 %endmacro
 
@@ -33,7 +33,7 @@ idt_set:
  [GLOBAL isr%1]
  isr%1:
    cli
-   push byte %1
+   push %1
    jmp isr_common_stub
 %endmacro
 
@@ -41,8 +41,8 @@ idt_set:
  global irq%1
  irq%1:
    cli
-   push byte 0
-   push byte %2
+   push 0
+   push %2
    jmp irq_common_stub
 %endmacro
 
@@ -95,38 +95,6 @@ IRQ  12,    44
 IRQ  13,    45
 IRQ  14,    46
 IRQ  15,    47
-
-extern syscall_handler
-
- [GLOBAL isr_sc]
- isr_sc:
-  cli
-  push BYTE 0
-  push BYTE 128
-  pusha
-
-  mov ax, ds
-  push eax
-
-  mov ax, 0x10
-  mov ds, ax
-  mov es, ax
-  mov fs, ax
-  mov gs, ax
- 
-  call syscall_handler
-
-  pop eax
-  mov ds, ax
-  mov es, ax
-  mov fs, ax
-  mov gs, ax
-
-  popa
-  add esp, 8
-  sti
-  iret
-
 
 [EXTERN isr_handler]
 

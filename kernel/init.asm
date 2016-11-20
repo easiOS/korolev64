@@ -5,6 +5,6 @@ jmp_to_init:
 	mov ebp, esp
 	xchg bx, bx
 	mov eax, [esp + 8]
-	jmp eax
+	call eax
 	pop ebp
 	ret

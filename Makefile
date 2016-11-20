@@ -23,4 +23,7 @@ format: format.c include/base.h include/fs/kssfs.h
 fsinspect: fsinspect.c include/base.h include/fs/kssfs.h
 	gcc -m32 -I include -o fsinspect fsinspect.c
 
+kssfs_fuse: kssfs_fuse.c
+	gcc -lfuse -o kssfs_fuse kssfs_fuse.c
+
 .PHONY: kernel iso run clean

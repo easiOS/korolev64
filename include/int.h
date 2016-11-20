@@ -101,6 +101,7 @@ extern void isr28();
 extern void isr29();
 extern void isr30();
 extern void isr31();
+extern void isr127();
 extern void irq0 ();
 extern void irq1 ();
 extern void irq2 ();
@@ -117,6 +118,5 @@ extern void irq12();
 extern void irq13();
 extern void irq14();
 extern void irq15();
-extern void isr_sc();
 
 #endif /* H_INT */

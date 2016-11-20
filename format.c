@@ -20,7 +20,7 @@ int main(int argc, char** argv)
 	kssfs_header hdr;
 	memset(&hdr, 0, 512);
 	hdr.signature = KSSFS_SIGNATURE;
-	hdr.cluster_n = file_n;
+	hdr.cluster_n = 256;
 	fwrite(&hdr, 512, 1, f);
 	printf("FS header written\n");
 	kssfs_clstr_hdr chdr;
@@ -60,6 +60,12 @@ int main(int argc, char** argv)
 		fclose(f2);
 		fflush(f);
 		printf("OK\n");
+	}
+	char buf[8192];
+	memset(buf, 0, 8192);
+	for(int i = 0; i < 256 - file_n; i++)
+	{
+		fwrite(buf, 512, 16, f);
 	}
 	fclose(f);
 	return 0;

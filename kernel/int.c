@@ -114,7 +114,7 @@ void idt_setup(void)
 	idt_set_gate(45, (LONG)irq13, 0x08, 0x8E);
 	idt_set_gate(46, (LONG)irq14, 0x08, 0x8E);
 	idt_set_gate(47, (LONG)irq15, 0x08, 0x8E);
-	idt_set_gate(128, (LONG)isr_sc, 0x08, 0x8E);
+	idt_set_gate(127, (LONG)isr127, 0x08, 0x8E);
 
 	idt_set(&idtd);
 
@@ -158,14 +158,4 @@ void irq_handler(regs_t regs)
 	}
 
 	outb(0x20, 0x20); // send EOI
-}
-
-void syscall_handler(regs_t regs)
-{
-	switch(regs.eax)
-	{
-		case 0:
-			put('a'); put('y'); put('y'); put('\n');
-			break;
-	}
 }

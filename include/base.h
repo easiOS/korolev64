@@ -2,8 +2,7 @@
 #define H_BASE
 
 #include <stdint.h>
-
-#define NULL 0
+#include <stddef.h>
 
 typedef uint16_t WORD;
 typedef uint8_t BYTE;

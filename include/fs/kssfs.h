@@ -1,7 +1,9 @@
 #ifndef H_FS_KSSFS
 #define H_FS_KSSFS
 
+#ifdef __EASIOS__
 #include <base.h>
+#endif
 
 #define KSSFS_MBR_TYPE 0x7E
 #define KSSFS_CLSTR_SZ 8192

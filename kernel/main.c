@@ -1,4 +1,5 @@
 #include <base.h>
+#include <runtime.h>
 #include <text.h>
 #include <int.h>
 #include <multiboot.h>
@@ -13,6 +14,17 @@ static void gpf(regs_t regs)
 	//puts("========================\n");
 }
 
+static void syscall_handler(regs_t regs)
+{
+	puts("syscall!\n");
+	switch(regs.eax)
+	{
+		case 0:
+			puts((char*)regs.ebx);
+			break;
+	}
+}
+
 void kmain(LONG magic, LONG address)
 {
 	if(magic != MULTIBOOT2_BOOTLOADER_MAGIC)
@@ -25,6 +37,7 @@ void kmain(LONG magic, LONG address)
 	multiboot_process(address);
 	timer_setup();
 	pci_setup();
+	int_regh(127, syscall_handler);
 	asm volatile("sti");
 	if(!kssfs_avail())
 	{
@@ -40,15 +53,23 @@ void kmain(LONG magic, LONG address)
 		goto halt;
 	}
 
-	puts("found init\n some bytes from the file:\n");
+	puts("found init\n");
 
-	for(int i = 0; i < 29; i++)
+	kom_hdr_t* kom_hdr = (kom_hdr_t*)init;
+	if(kom_hdr->signature[0] == 'K' && kom_hdr->signature[1] == 'O' && kom_hdr->signature[2] == 'M' && kom_hdr->signature[3] == '0')
 	{
-		putn(init[i], 16);
-		puts(" ");
+		puts("KOM executable\n");
+		puts("Entry point: "); putn(kom_hdr->entry_point, 16); puts("\n");
+		puts("Begin...\n");
+		jmp_to_init(kom_hdr->entry_point);
 	}
-
-	jmp_to_init(init);
+	else
+	{
+		puts("not a KOM executable: ");
+		for(int i = 0; i < 4; i++)
+			put(kom_hdr->signature[i]);
+		puts("\n");
+	}
 
 	puts("attempted to kill init\n");
 

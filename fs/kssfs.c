@@ -32,8 +32,6 @@ void kssfs_init(LONG lba)
 		return;
 	}
 	kssfs_cluster_n = kssfs_hdr->cluster_n;
-	putn(kssfs_hdr->cluster_n, 10);
-	puts("\n");
 	puts("[kssfs] init: header is correct\n");
 	kmemset(kssfs_fn_cache, 0, 32 * sizeof(kssfs_fn_cache_t));
 	kmemset(kssfs_buf, 0, 8192);
@@ -49,7 +47,11 @@ void kssfs_read_cluster(LONG n)
 		return;
 	if(n == kssfs_clstr_index)
 		return;
-	ide_read_sector(KSSFS_CLSTR_LBA(n), kssfs_buf, 16, 0);
+	LONG startc = KSSFS_CLSTR_LBA(n);
+	for(int i = 0; i < 16; i++)
+	{
+		ide_read_sector(startc + i, kssfs_buf + 512 * i, 1, 0);
+	}
 	kssfs_clstr_index = n;
 }
 
@@ -59,7 +61,11 @@ void kssfs_write_cluster(LONG n, BYTE* buf)
 		return;
 	if(n > kssfs_cluster_n)
 		return;
-	ide_write_sector(KSSFS_CLSTR_LBA(n), buf, 16, 0);
+	LONG startc = KSSFS_CLSTR_LBA(n);
+	for(int i = 0; i < 16; i++)
+	{
+		ide_write_sector(startc + i, buf + i * 512, 1, 0);
+	}
 }
 
 int kssfs_read_file(void* dest, char* filename)
@@ -78,17 +84,9 @@ int kssfs_read_file(void* dest, char* filename)
 	for(int i = 0; i < kssfs_cluster_n; i++)
 	{
 		kssfs_read_cluster(i);
-		puts("read_file: \"");
-		puts(kssfs_clstr->filename);
-		puts("\"\n");
 		if(strncmp(kssfs_clstr->filename, filename, 256) == 0)
 		{
 			memcpy(dest, kssfs_clstr->data, kssfs_clstr->len);
-			for(int i = 0; i < 128; i++)
-			{
-				putn(kssfs_clstr->data[i], 16);
-				puts(" ");
-			}
 			return 1;
 		}
 	}
