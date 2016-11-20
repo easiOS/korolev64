@@ -1,0 +1,6 @@
+build/
+*.o
+disk.img
+disk.iso
+format
+fsinspect

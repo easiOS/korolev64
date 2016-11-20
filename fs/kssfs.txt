@@ -1,0 +1,42 @@
+Korolev Semi-Static File System
+===============================
+
+A KSSFS a Korolev kernelnek a beépített fájlrendszere.
+
+#### MBR
+A fájlrendszert a 0x7E típusú MBR partíción kell elhelyezni.
+
+#### Struktúra
+A fájlrendszer egy 512-bájtos fejlécből, majd 8KB-os klaszterekből áll.
+Az 512-bájtos fejléc felépítése az alábbi:
+
+*---------------------------------------------------------------------
+| NÉV		| HOSSZ		| ÉRTÉK
+*---------------------------------------------------------------------
+| signature	| 4B		| 0x37019626 (Little-Endian)
+*---------------------------------------------------------------------
+| cluster_n	| 4B		| Klaszterek száma
+*---------------------------------------------------------------------
+| reserved	| 504B		| Lefoglalt
+*---------------------------------------------------------------------
+
+A klaszter első 512 bájtja a klaszterfejléc. A maradék része adat.
+Az 512-bájtos fejléc felépítése az alábbi:
+
+*---------------------------------------------------------------------
+| NÉV		| HOSSZ		| ÉRTÉK
+*---------------------------------------------------------------------
+| type		| 4B		| 0 = lefoglalatlan klaszter,
+|			|			| 1 = COM futtatható fájl
+|			|			| 2 = adatfájl (nem futtatható)
+*---------------------------------------------------------------------
+| length	| 2B		| Az adat hossza
+*---------------------------------------------------------------------
+| name		| 256B	| A fájl neve \0-val terminálva
+*---------------------------------------------------------------------
+| owner		| 4B	| Owner UID
+*---------------------------------------------------------------------
+| group		| 4B	| Owner GID
+*---------------------------------------------------------------------
+| perm		| 4B	| File permission bits
+*---------------------------------------------------------------------
