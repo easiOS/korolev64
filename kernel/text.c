@@ -89,14 +89,18 @@ void clear(void)
 	{
 		*a = 0;
 	}
+	text_x = 0;
+	text_y = 0;
+	upd_cur();
 }
 
 void puts(char* s)
 {
+	char* s2 = s;
 	strm = 1;
-	while(*s)
+	while(*s2)
 	{
-		put(*s++);
+		put(*s2++);
 	}
 	strm = 0;
 	upd_cur();

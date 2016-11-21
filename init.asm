@@ -7,11 +7,15 @@ kom_header:
 .reserved: times 16 db 0
 
 _start:
-	pusha
+
 	mov eax, 0
 	mov ebx, msg
 	int 0x7f
-	popa
+	
+	mov eax,0
+	mov ebx, msg
+	int 0x7f
+
 	ret
 
 msg: db "Hello World!", 10, 0

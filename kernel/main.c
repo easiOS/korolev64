@@ -16,11 +16,18 @@ static void gpf(regs_t regs)
 
 static void syscall_handler(regs_t regs)
 {
-	puts("syscall!\n");
+	//puts("syscall!\n");
+	LONG a, b, c, d;
+	char* e;
 	switch(regs.eax)
 	{
 		case 0:
-			puts((char*)regs.ebx);
+			e = (char*)regs.ebx;
+			while(*e)
+				put(*e++);
+			break;
+		case 1:
+			clear();
 			break;
 	}
 }

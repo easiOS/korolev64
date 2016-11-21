@@ -32,3 +32,8 @@ void sleep(LONG t)
 	for(int i = 0; i < t; i++)
 		cpu_relax();
 }
+
+LONG timer_get(void)
+{
+	return timer;
+}

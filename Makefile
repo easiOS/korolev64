@@ -1,4 +1,4 @@
-all: kernel iso format
+all: kernel iso format fsinspect kssfs_fuse
 
 kernel:
 	mkdir -p build
@@ -8,7 +8,7 @@ iso: kernel
 	python3 biso.py
 
 run: disk.iso
-	qemu-system-i386 -boot d -hda disk.img -cdrom disk.iso -m 512
+	qemu-system-x86_64 -boot d -hda disk.img -cdrom disk.iso -m 512
 
 runb: disk.iso
 	bochs -q
