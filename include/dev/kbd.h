@@ -10,4 +10,8 @@ typedef struct {
 	BYTE special : 1; // doublescan in easiOS
 } PACK kbd_event_t;
 
+void kbd_setup(void);
+LONG kbd_avail(void);
+kbd_event_t kbd_pop(void); 
+
 #endif /* H_DEV_KBD */
