@@ -44,11 +44,14 @@ static void syscall_handler(regs_t regs)
 			break;
 		case 3: // read keyboard (blocking)
 			while(!kbd_avail());
+			put('K');
 			k = kbd_pop();
-			regs.ebx = *((WORD*)(&k));
+			regs.ebx = k.keycode;
+			regs.ecx = k.release | k.ctrl << 1 | k.alt << 2 | k.shift << 3 | k.special << 4;
 			break;
 
 	}
+	put('S'); put('T'); put('O'); put('P'); 
 }
 
 void kmain(LONG magic, LONG address)
@@ -82,7 +85,7 @@ void kmain(LONG magic, LONG address)
 
 	puts("found init\n");
 
-	kbd_enable();
+	kbd_reset();
 
 	kom_hdr_t* kom_hdr = (kom_hdr_t*)init;
 	if(kom_hdr->signature[0] == 'K' && kom_hdr->signature[1] == 'O' && kom_hdr->signature[2] == 'M' && kom_hdr->signature[3] == '0')

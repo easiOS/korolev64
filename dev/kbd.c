@@ -106,9 +106,9 @@ void kbd_setup(void)
 	puts("OK!\n");
 }
 
-void kbd_enable(void)
+void kbd_reset(void)
 {
-	//kbd_stack_sp = &kbd_stack[511];
+	kbd_stack_sp = &kbd_stack[511];
 }
 
 LONG kbd_avail(void)
