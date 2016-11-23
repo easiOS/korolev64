@@ -32,9 +32,10 @@ char* kbd_keycode_shift_map;
 
 static void kbd_interrupt(regs_t regs)
 {
-	if(!(inb(0x64) & 1)) return;
 	BYTE scancode;
 	LONG a, spec, kc;
+	if(!(inb(0x64) & 1)) return;
+	puts("Keyboard interrupt\n");
 	scancode = inb(0x60);
 	a = inb(0x61);
 	spec = scancode == 0xE0;
@@ -79,11 +80,35 @@ void kbd_setup(void)
 {
 	puts("Keyboard setup...");
 	kmemset(kbd_stack, 0, 512 * sizeof(kbd_event_t));
+	// disable ports
+	kbd_ps2_cmd(0xAD);
+	kbd_ps2_cmd(0xA7);
+	// flush output buffer
+	kbd_ps2_flush_buf();
+	if(!kbd_ps2_selftest())
+	{
+		puts("SELF TEST FAIL\n");
+		return;
+	}
+	if(!kbd_ps2_testch(1))
+	{
+		puts("CH1 TEST FAIL\n");
+		return;
+	}
+	// enable port 1
+	kbd_ps2_cmd(0xAE);
+	kbd_ps2_enable_irq();
+	kbd_ps2_write_data(0xFF); // reset KBD
 	ctrl = 0;
 	alt = 0;
 	shift = 0;
 	int_regh(IRQ1, &kbd_interrupt);
 	puts("OK!\n");
+}
+
+void kbd_enable(void)
+{
+	//kbd_stack_sp = &kbd_stack[511];
 }
 
 LONG kbd_avail(void)
@@ -94,4 +119,52 @@ LONG kbd_avail(void)
 kbd_event_t kbd_pop(void)
 {
 	return *--kbd_stack_sp;
+}
+
+void kbd_ps2_cmd(BYTE cmd)
+{
+	while(inb(0x64) & 2);
+	outb(0x64, cmd);
+}
+
+void kbd_ps2_flush_buf(void)
+{
+	inb(0x60);
+}
+
+BYTE kbd_ps2_read_data(void)
+{
+	while(~inb(0x64) & 1);
+	return inb(0x60);
+}
+
+void kbd_ps2_write_data(BYTE val)
+{
+	while(inb(0x64) & 2);
+	outb(0x60, val);
+}
+
+BYTE kbd_ps2_selftest(void)
+{
+	kbd_ps2_cmd(0xAA);
+	return kbd_ps2_read_data() == 0x55;
+}
+
+BYTE kbd_ps2_testch(BYTE ch)
+{
+	switch(ch)
+	{
+		case 1:
+			kbd_ps2_cmd(0xAB);
+			return kbd_ps2_read_data() == 0;
+		case 2:
+			kbd_ps2_cmd(0xA9);
+			return kbd_ps2_read_data() == 0;
+	}
+}
+
+void kbd_ps2_enable_irq(void)
+{
+	kbd_ps2_cmd(0x60);
+	kbd_ps2_write_data(0b01100111);
 }

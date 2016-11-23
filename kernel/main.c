@@ -6,6 +6,7 @@
 #include <port.h>
 #include <dev/pci.h>
 #include <dev/timer.h>
+#include <dev/kbd.h>
 
 static void gpf(regs_t regs)
 {
@@ -19,16 +20,34 @@ static void syscall_handler(regs_t regs)
 	//puts("syscall!\n");
 	LONG a, b, c, d;
 	char* e;
+	kbd_event_t k;
 	switch(regs.eax)
 	{
-		case 0:
+		case 0: // print string
 			e = (char*)regs.ebx;
 			while(*e)
 				put(*e++);
 			break;
-		case 1:
+		case 1: // clear screen
 			clear();
 			break;
+		case 2: // read keyboard (non-blocking, returns 0xffff if there's no available key)
+			if(kbd_avail())
+			{
+				k = kbd_pop();
+				regs.ebx = *((WORD*)(&k));
+			}
+			else
+			{
+				regs.ebx = 0xffff;
+			}
+			break;
+		case 3: // read keyboard (blocking)
+			while(!kbd_avail());
+			k = kbd_pop();
+			regs.ebx = *((WORD*)(&k));
+			break;
+
 	}
 }
 
@@ -44,6 +63,7 @@ void kmain(LONG magic, LONG address)
 	multiboot_process(address);
 	timer_setup();
 	pci_setup();
+	kbd_setup();
 	int_regh(127, syscall_handler);
 	asm volatile("sti");
 	if(!kssfs_avail())
@@ -61,6 +81,8 @@ void kmain(LONG magic, LONG address)
 	}
 
 	puts("found init\n");
+
+	kbd_enable();
 
 	kom_hdr_t* kom_hdr = (kom_hdr_t*)init;
 	if(kom_hdr->signature[0] == 'K' && kom_hdr->signature[1] == 'O' && kom_hdr->signature[2] == 'M' && kom_hdr->signature[3] == '0')
