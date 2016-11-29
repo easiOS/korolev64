@@ -10,6 +10,7 @@ typedef uint32_t LONG;
 typedef uint64_t QUAD;
 
 #define PACK __attribute__((packed))
+#define ALIGN4K __attribute__((aligned(4096)))
 
 static inline void cpu_relax(void)
 {

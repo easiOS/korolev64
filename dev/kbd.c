@@ -118,7 +118,7 @@ LONG kbd_avail(void)
 
 kbd_event_t kbd_pop(void)
 {
-	return *--kbd_stack_sp;
+	return *(++kbd_stack_sp);
 }
 
 void kbd_ps2_cmd(BYTE cmd)
