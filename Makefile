@@ -1,4 +1,4 @@
-all: kernel iso format fsinspect kssfs_fuse
+all: kernel iso
 
 kernel:
 	mkdir -p build
@@ -16,14 +16,5 @@ runb: disk.iso
 clean:
 	rm -rf build
 	rm -rf disk.iso
-
-format: format.c include/base.h include/fs/kssfs.h
-	gcc -m32 -I include -o format format.c
-
-fsinspect: fsinspect.c include/base.h include/fs/kssfs.h
-	gcc -m32 -I include -o fsinspect fsinspect.c
-
-kssfs_fuse: kssfs_fuse.c
-	gcc -lfuse -o kssfs_fuse kssfs_fuse.c
 
 .PHONY: kernel iso run clean

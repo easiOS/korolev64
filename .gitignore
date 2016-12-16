@@ -6,3 +6,4 @@ format
 fsinspect
 kssfs_fuse
 iso/boot/kernel.elf
+tools/build/

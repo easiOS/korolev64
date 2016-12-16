@@ -14,8 +14,8 @@
 #include <time.h>
 #include <string.h>
 
-#include "include/base.h"
-#include "include/fs/kssfs.h" 
+#include <base.h>
+#include <fs/kssfs.h>
 
 FILE* kssfs_file = NULL;
 BYTE buf[8192];
