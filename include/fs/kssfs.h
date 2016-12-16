@@ -35,4 +35,6 @@ typedef struct {
 	LONG cluster;
 } PACK kssfs_fn_cache_t;
 
+int kssfs_init(LONG lba);
+
 #endif /* H_FS_KSSFS */

@@ -13,23 +13,23 @@ kssfs_fn_cache_t kssfs_fn_cache[32];
 kssfs_header* kssfs_hdr = (kssfs_header*)kssfs_buf;
 kssfs_clstr_hdr* kssfs_clstr = (kssfs_clstr_hdr*)kssfs_buf;
 
-void kssfs_init(LONG lba)
+int kssfs_init(LONG lba)
 {
 	if(kssfs_lba)
-		return;
+		return 0;
 	kssfs_lba = lba;
 	puts("[kssfs] init: reading fs header\n");
 	if(ide_read_sector(kssfs_lba, kssfs_buf, 1, 0))
 	{
 		puts("[kssfs] init: read error while reading kssfs_header\n");
 		kssfs_lba = 0;
-		return;
+		return 0;
 	}
 	if(kssfs_hdr->signature != KSSFS_SIGNATURE)
 	{
 		puts("[kssfs] init: signature is incorrect\n");
 		kssfs_lba = 0;
-		return;
+		return 0;
 	}
 	kssfs_cluster_n = kssfs_hdr->cluster_n;
 	puts("[kssfs] init: header is correct\n");
@@ -37,6 +37,7 @@ void kssfs_init(LONG lba)
 	kmemset(kssfs_buf, 0, 8192);
 	kssfs_clstr_index = 0xffffffff;
 	puts("[kssfs] init: OK\n");
+	return 1;
 }
 
 void kssfs_read_cluster(LONG n)

@@ -1,0 +1,56 @@
+Korolev File System Mark II
+===========================
+
+A KSSFS a Korolev64 beépített fájlrendszere. A Mark II az eredeti
+rendszer továbbfejlesztése.
+Célja a ~8K-nál nagyobb fájlok lehetővé tétele.
+
+#### MBR
+A fájlrendszert a 0x7E típusú MBR partíción kell elhelyezni.
+
+#### Struktúra
+A fájlrendszer egy 512-bájtos fejlécből, majd 8KB-os klaszterekből áll.
+Az 512-bájtos fejléc felépítése az alábbi:
+
++-----------+-----------+-----------------------------------------------------
+| NÉV		| HOSSZ		| ÉRTÉK
++-----------+-----------+-----------------------------------------------------
+| signature	| 4B		| 0x37019627 (Little-Endian)
++-----------+-----------+-----------------------------------------------------
+| cluster_n	| 4B		| Klaszterek száma
++-----------+-----------+-----------------------------------------------------
+| mark      | 4B        | Fájlrendszer verziója, 0 = Mark I, 1 = Mark II, etc.
++-----------+-----------+-----------------------------------------------------
+| reserved	| 500B		| Lefoglalt
++-----------+-----------+-----------------------------------------------------
+
+A klaszter első 512 bájtja a fejléc, ami a következőképpen néz ki:
+
++-----------------------------------------------------------------------
+| NÉV		| HOSSZ		| ÉRTÉK
++-----------------------------------------------------------------------
+| type		| 4B		| 0 = lefoglalatlan klaszter,
+|			|			| 1 = fájl
+|			|			| 2 = fájlfolytatás
++-----------------------------------------------------------------------
+| length	| 4B		| Az adat hossza
++-----------------------------------------------------------------------
+| name		| 256B      | A klaszter neve \0-val terminálva
++-----------------------------------------------------------------------
+| owner		| 4B	    | Owner UID
++-----------------------------------------------------------------------
+| group		| 4B	    | Owner GID
++-----------------------------------------------------------------------
+| perm		| 4B	    | File permission bits
++-----------------------------------------------------------------------
+| next      | 4B        | A klaszter ahol folytatódik az adat. 0 = nincs
++-----------------------------------------------------------------------
+
+A klaszter típusa háromféle lehet:
+* Lefoglalatlan (ezen a klaszteren nincs még adat vagy már törölték)
+* Fájl (az adatszekció adatot tartalmaz)
+* Fájlfolytatás (az adatszekció egy másik fájl folytatása)
+
+A 'next' jelöli a klasztert, ahol a fájl folytatódik. A 'next'
+azonosítójú klaszternek KELL fejléc, de elég, ha mindössze a típus
+be van állítva (valamint a 'next', ha szükség van rá).
