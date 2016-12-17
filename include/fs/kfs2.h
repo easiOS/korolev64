@@ -1,3 +1,6 @@
+// Korolev File System Mark II
+// For specifications, see fs/kfs2.txt
+
 #ifndef H_FS_KFS2
 #define H_FS_KFS2
 

@@ -2,6 +2,9 @@
 #include <text.h>
 #include <dev/disk.h>
 #include <fs/kfs2.h>
+#include <stdlib.h>
+#include <string.h>
+#include <errno.h>
 
 LONG kfs2_lba = 0;
 BYTE kfs2_buf[16384];
@@ -59,10 +62,51 @@ void kfs2_read_cluster(LONG n)
 
 LONG kfs2_read_byte(LONG file, BYTE* dest, LONG n, LONG off)
 {
-
+	LONG dest_p = 0;
+	for(int i = off; i < off + n; i++)
+	{
+		kfs2_read_cluster(KFS2_BYTE_CLSTR(i));
+		dest[dest_p++] = kfs2_buf[512 + KFS2_BYTE_CLSTR_OFF(i)];
+	}
+	return dest_p;
 }
 
 LONG kfs2_open_file(char* filename)
 {
+	for(int i = 0; i < kfs2_cluster_n; i++)
+	{
+		kfs2_read_cluster(i);
+		if(kfs2_cluster->type != KFS2_TYPE_FILE)
+			continue;
+		if(strncmp(filename, (char*)kfs2_cluster->name, 256) == 0)
+		{
+			for(int j = 0; j < KFS2_MAX_FILES; j++)
+			{
+				if((kfs2_handles[j].flags & 1) == 0)
+				{
+					kfs2_handles[j].flags = 1;
+					kfs2_handles[j].startclstr = i;
+					return j;
+				}
+			}
+			kfs2_err = EMFILE;
+			return -1;
+		}
+	}
+	kfs2_err = ENOENT;
+	return -1;
+}
 
+void kfs2_close_file(LONG handle)
+{
+	if(handle >= KFS2_MAX_FILES)
+	{
+		kfs2_err = ENOENT;
+		return;
+	}
+	if(kfs2_handles[handle].flags & 1)
+	{
+		kfs2_handles[handle].flags = 0;
+		kfs2_handles[handle].startclstr = 0;
+	}
 }

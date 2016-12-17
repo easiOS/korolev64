@@ -1,3 +1,7 @@
+// Korolev Semi-Static File System (Korolev File System Mark I)
+// Deprecated
+// For specifications, see fs/kssfs.txt
+
 #ifndef H_FS_KSSFS
 #define H_FS_KSSFS
 
