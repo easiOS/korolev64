@@ -62,10 +62,36 @@ void kfs2_read_cluster(LONG n)
 
 LONG kfs2_read_byte(LONG file, BYTE* dest, LONG n, LONG off)
 {
-	LONG dest_p = 0;
+	LONG dest_p;
+	kfs2_file* f;
+	LONG clstr, clstr_n, t;
+
+	dest_p = 0;
+	f = &kfs2_handles[file];
+	if(!(f->flags & 1))
+	{
+		kfs2_err = ENOENT;
+		return 0;
+	}
 	for(int i = off; i < off + n; i++)
 	{
-		kfs2_read_cluster(KFS2_BYTE_CLSTR(i));
+		t = KFS2_BYTE_CLSTR(i);
+		if(t != clstr_n)
+		{
+			clstr = f->startclstr;
+			clstr_n = t;
+		}
+		while(1)
+		{
+			kfs2_read_cluster(clstr);
+			if(clstr_n != 0)
+			{
+				clstr = kfs2_cluster->next;
+				clstr_n--;
+				continue;
+			}
+			break;
+		}
 		dest[dest_p++] = kfs2_buf[512 + KFS2_BYTE_CLSTR_OFF(i)];
 	}
 	return dest_p;
