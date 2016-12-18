@@ -7,6 +7,7 @@ pci			/dev/pci.c
 disk		/dev/disk.c
 kbd			/dev/kbd.c
 timer		/dev/timer.c
+serial		/dev/serial.c
 
 kssfs		/fs/kssfs.c
 kfs2		/fs/kfs2.c
