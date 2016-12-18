@@ -5,7 +5,7 @@ all: tools tools2
 
 tools: build build/mkfs.kssfs build/mount.kssfs build/fsinspect
 
-tools2: build build/mkfs.kfs2
+tools2: build build/mkfs.kfs2 #build/mount.kfs2
 
 build:
 	mkdir -p build
@@ -21,6 +21,9 @@ build/fsinspect: fsinspect.c ../include/base.h ../include/fs/kssfs.h
 
 build/mkfs.kfs2: mkfs.kfs2.c ../include/base.h ../include/fs/kfs2.h
 	gcc $(CFLAGS) -o build/mkfs.kfs2 mkfs.kfs2.c
+
+#build/mount.kfs2: mount.kfs2.c ../include/base.h ../include/fs/kfs2.h
+#	gcc $(CFLAGS) -lfuse -o build/mount.kfs2 mount.kfs2.c
 
 clean:
 	rm -rf build

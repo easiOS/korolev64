@@ -31,7 +31,7 @@ int kfs2_init(LONG lba)
 	}
 	if(kfs2_hdr->signature != KFS2_SIGNATURE)
 	{
-		puts("[kssfs] init: signature is incorrect\n");
+		puts("[kfs2] init: signature is incorrect\n");
 		kfs2_lba = 0;
 		return 0;
 	}
