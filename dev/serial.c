@@ -29,7 +29,7 @@ void serial_setup_port(WORD port)
 	serial_status[port] = 1;
 }
 
-LONG serial_enabled(WORD port)
+inline LONG serial_enabled(WORD port)
 {
 	return serial_status[port];
 }

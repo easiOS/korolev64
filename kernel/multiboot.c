@@ -20,8 +20,6 @@ void cmdline_process(char* cmd)
         }
         cc++;
     } while(*cc);
-    puts(cmd); put('\n');
-    puts(arg); put('\n');
     cmdline_cmd* c = cmdline_cmds;
     while(c->cmd[0] != '\0')
     {

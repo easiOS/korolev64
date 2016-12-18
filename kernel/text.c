@@ -1,6 +1,7 @@
 #include <base.h>
 #include <port.h>
 #include <text.h>
+#include <dev/serial.h>
 
 #define TEXTMEM (WORD*)(0xB8000)
 #define MAX_X 80
@@ -16,6 +17,10 @@ BYTE fg = C_LGRAY, bg = C_BLACK;
 
 void put(char c)
 {
+	if(serial_enabled(0))
+	{
+		serial_write(0, (BYTE)c);
+	}
 	switch(c)
 	{
 		case '\n':

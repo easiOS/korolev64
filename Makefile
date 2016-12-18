@@ -8,7 +8,7 @@ iso: kernel
 	python3 biso.py
 
 run: disk.iso
-	qemu-system-x86_64 -boot d -hda disk.img -cdrom disk.iso -m 512
+	qemu-system-x86_64 -boot d -hda disk.img -cdrom disk.iso -m 512 -serial stdio
 
 runb: disk.iso
 	bochs -q
