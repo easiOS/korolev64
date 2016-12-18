@@ -1,0 +1,29 @@
+Commit prefixes
+
+============================
+boot		/boot/*
+
+pci			/dev/pci.c
+disk		/dev/disk.c
+kbd			/dev/kbd.c
+timer		/dev/timer.c
+
+kssfs		/fs/kssfs.c
+kfs2		/fs/kfs2.c
+
+core		/kernel/*
+multiboot	/kernel/multiboot.c
+paging		/kernel/paging.c
+cswitch		/kernel/switch.c
+text		/kernel/text.c
+kshell		/kernel/kshell.c
+int			/kernel/int.c
+			/kernel/inta.asm
+runtime		/kernel/main.c
+			/include/runtime.h
+
+libc		/libc/*
+
+tools		/tools/*
+
+project		/*		(Makefile, README, etc.)
