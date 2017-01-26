@@ -22,6 +22,8 @@ int			/kernel/int.c
 			/kernel/inta.asm
 runtime		/kernel/main.c
 			/include/runtime.h
+net			/net/
+			/include/net/
 
 libc		/libc/*
 
