@@ -7,51 +7,13 @@
 #include <dev/pci.h>
 #include <dev/timer.h>
 #include <dev/kbd.h>
+#include <syscall.h>
 
 static void gpf(regs_t regs)
 {
 	//puts("========================\n");
 	//puts("GENERAL PROTECTION FAULT\n");
 	//puts("========================\n");
-}
-
-static void syscall_handler(regs_t regs)
-{
-	//puts("syscall!\n");
-	LONG a, b, c, d;
-	char* e;
-	kbd_event_t k;
-	switch(regs.eax)
-	{
-		case 0: // print string
-			e = (char*)regs.ebx;
-			while(*e)
-				put(*e++);
-			break;
-		case 1: // clear screen
-			clear();
-			break;
-		case 2: // read keyboard (non-blocking, returns 0xffff if there's no available key)
-			if(kbd_avail())
-			{
-				k = kbd_pop();
-				regs.ebx = *((WORD*)(&k));
-			}
-			else
-			{
-				regs.ebx = 0xffff;
-			}
-			break;
-		case 3: // read keyboard (blocking)
-			while(!kbd_avail());
-			put('K');
-			k = kbd_pop();
-			regs.ebx = k.keycode;
-			regs.ecx = k.release | k.ctrl << 1 | k.alt << 2 | k.shift << 3 | k.special << 4;
-			break;
-
-	}
-	put('S'); put('T'); put('O'); put('P'); 
 }
 
 void kmain(LONG magic, LONG address)
@@ -67,7 +29,7 @@ void kmain(LONG magic, LONG address)
 	timer_setup();
 	pci_setup();
 	kbd_setup();
-	int_regh(127, syscall_handler);
+	syscall_setup();
 	asm volatile("sti");
 	if(!kssfs_avail())
 	{
@@ -92,7 +54,7 @@ void kmain(LONG magic, LONG address)
 	{
 		puts("KOM executable\n");
 		puts("Entry point: "); putn(kom_hdr->entry_point, 16); puts("\n");
-		puts("Begin...\n");
+		puts("Begin...\n\n");
 		jmp_to_init(kom_hdr->entry_point);
 	}
 	else

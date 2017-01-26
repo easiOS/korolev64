@@ -103,6 +103,8 @@ void kbd_setup(void)
 	alt = 0;
 	shift = 0;
 	int_regh(IRQ1, &kbd_interrupt);
+	kbd_keycode_map = kbd_keycode_default_map;
+	kbd_keycode_shift_map = kbd_keycode_shift_default_map;
 	puts("OK!\n");
 }
 
@@ -167,4 +169,9 @@ void kbd_ps2_enable_irq(void)
 {
 	kbd_ps2_cmd(0x60);
 	kbd_ps2_write_data(0b01100111);
+}
+
+BYTE kbd_kc2ch(kbd_event_t kc)
+{
+	return 0;
 }

@@ -111,6 +111,17 @@ void puts(char* s)
 	upd_cur();
 }
 
+void puts_int(char* s)
+{
+	char* s2 = s;
+	strm = 1;
+	while(*s2)
+	{
+		put(*(s2++));
+	}
+	strm = 0;
+}
+
 void putn(int n, int base)
 {
 	char buf[32];

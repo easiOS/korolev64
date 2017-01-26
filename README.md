@@ -1,6 +1,6 @@
 # Korolev64
 
-Korolev64 is an in-development microkernel for x86.
+Korolev64 is an in-development kernel for x86.
 
 ## Features implemented
 * Text terminal
@@ -11,8 +11,6 @@ Korolev64 is an in-development microkernel for x86.
 * Linux userspace tools for the built-in filesystem
 
 ## Planned features
-* Task switching
-* Paging
 * Improved KSSFS (KFS2)
 * Move filesystems and disk handling into userspace once task switching and system calls are complete
 
