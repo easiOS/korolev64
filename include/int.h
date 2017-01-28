@@ -59,6 +59,8 @@ typedef void (*isr_t)(regs_t);
 typedef struct idt_entry idt_t;
 typedef struct gdt_entry gdt_t;
 
+void int_regh(BYTE id, isr_t handler);
+
 void int_setup(void);
 
 void idt_setup(void);
