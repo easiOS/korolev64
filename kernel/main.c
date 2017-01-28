@@ -27,10 +27,10 @@ void kmain(LONG magic, LONG address)
 	puts("Korolev64\n");
 	int_setup();
 	multiboot_process(address);
-	timer_setup();
-	pci_setup();
-	kbd_setup();
 	syscall_setup();
+	timer_setup();
+	kbd_setup();
+	pci_setup();
 	ethernet_setup();
 	asm volatile("sti");
 	if(!kssfs_avail())
