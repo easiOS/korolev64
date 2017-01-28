@@ -24,6 +24,8 @@ runtime		/kernel/main.c
 			/include/runtime.h
 net			/net/
 			/include/net/
+memory		/kernel/memory.c
+			/include/memory.h
 
 libc		/libc/*
 

@@ -8,6 +8,7 @@
 #include <dev/timer.h>
 #include <dev/kbd.h>
 #include <syscall.h>
+#include <net/ethernet.h>
 
 static void gpf(regs_t regs)
 {
@@ -30,6 +31,7 @@ void kmain(LONG magic, LONG address)
 	pci_setup();
 	kbd_setup();
 	syscall_setup();
+	ethernet_setup();
 	asm volatile("sti");
 	if(!kssfs_avail())
 	{

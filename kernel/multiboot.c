@@ -2,6 +2,7 @@
 #include <multiboot.h>
 #include <text.h>
 #include <string.h>
+#include <memory.h>
 
 #include <cmdline.h>
 
@@ -47,6 +48,7 @@ void multiboot_process(LONG address)
     	switch(tag->type)
     	{
     		case MULTIBOOT_TAG_TYPE_CMDLINE:
+            {
                 cmdline = ((struct multiboot_tag_string*)tag)->string;
     			puts("Kernel command line: ");
     			puts(cmdline);
@@ -70,6 +72,13 @@ void multiboot_process(LONG address)
                 cmdline_process(buf);
 
     			break;
+            }
+            case MULTIBOOT_TAG_TYPE_MMAP:
+            {
+                struct multiboot_tag_mmap *tagmmap = (struct multiboot_tag_mmap *)tag;
+                int mmap_n = (tagmmap->size - 16) / sizeof(struct multiboot_mmap_entry);
+                memmgmt_init(tagmmap->entries, mmap_n);
+            }
     	}
     }
 }

@@ -289,3 +289,15 @@ void *memcpy(void *dest, const void *src, size_t n)
   return ret;
 
 }
+
+void* malloc(size_t size)
+{
+  if(size <= 0){return 0;}
+  return mmgmt_alloc(size);
+}
+
+void free(void* ptr)
+{
+  if(!ptr) return;
+  mmgmt_free(ptr);
+}

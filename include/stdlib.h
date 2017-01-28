@@ -5,6 +5,8 @@
 
 int atoi(const char* s);
 char* itoa(int n, char* s, int base);
+void free(void* ptr);
+void* malloc(size_t size);
 
 #endif /* __linux__ */
 
