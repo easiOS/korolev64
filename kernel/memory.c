@@ -345,17 +345,23 @@ void check(void) {
 void memmgmt_init(struct multiboot_mmap_entry* mmap, int mmap_size)
 {
   char b[64];
+  int max = 0;
+  int maxi = -1;
   for(int i = 0; i < mmap_size; i++)
   {
     puts("mmap entry #"); puts(itoa(i, b, 10));
 		puts("\n    addr: 0x"); puts(itoa(mmap[i].addr, b, 16));
 		puts("\n    len:  "); puts(itoa(mmap[i].len, b, 10));
 		puts("\n    type: "); puts(itoa(mmap[i].type, b, 10)); puts("\n");
-    if(i != 0 && mmap[i].type == 1)
+    if(mmap[i].len > max && mmap[i].type == MULTIBOOT_MEMORY_AVAILABLE)
     {
-      mrvn_memory_init((void*)(LONG)mmap[i].addr, mmap[i].len);
+        max = mmap[i].len;
+        maxi = i;
     }
   }
+  mrvn_memory_init((void*)(LONG)mmap[maxi].addr, mmap[maxi].len);
+  puts("[memory] Memory available: ");
+  putn(max, 10); puts(" bytes\n");
 }
 
 void* mmgmt_alloc(size_t size)
