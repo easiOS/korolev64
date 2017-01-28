@@ -2,6 +2,7 @@
 #define H_DEV_PCI
 
 #include <base.h>
+#include <int.h>
 
 #define PCI_PORT_CONF_ADDR 0xCF8
 #define PCI_PORT_CONF_DATA 0xCFC
@@ -47,6 +48,12 @@ typedef struct {
 	BYTE subclass;
 } pci_dev_t;
 
+typedef struct {
+	void* priv;
+	void (*handler)(regs_t regs, void* dev_id);
+	LONG bus, device, function;
+} pci_int_entry;
+
 void pci_setup(void);
 
 BYTE pci_cfg_readb(BYTE bus, BYTE dev, BYTE func, BYTE off);
@@ -55,5 +62,9 @@ LONG pci_cfg_readl(BYTE bus, BYTE dev, BYTE func, BYTE off);
 void pci_cfg_writeb(BYTE bus, BYTE dev, BYTE func, BYTE off, BYTE val);
 void pci_cfg_writew(BYTE bus, BYTE dev, BYTE func, BYTE off, WORD val);
 void pci_cfg_writel(BYTE bus, BYTE dev, BYTE func, BYTE off, LONG val);
+
+#define pci_cfg_read_status(bus, dev, func) pci_cfg_readw(bus, dev, func, PCI_CFG_STA)
+#define pci_cfg_read_command(bus, dev, func) pci_cfg_readw(bus, dev, func, PCI_CFG_CMD)
+#define pci_cfg_read_intl(bus, dev, func) pci_cfg_readb(bus, dev, func, PCI_CFG_INT)
 
 #endif /* H_DEV_PCI */

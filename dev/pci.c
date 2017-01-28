@@ -2,16 +2,25 @@
 #include <dev/pci.h>
 #include <port.h>
 #include <text.h>
+#include <int.h>
 
 #include <dev/disk.h>
+#include <dev/e1000.h>
 
 pci_dev_t* pci_devices[] = {
 	&pci_dev_disk,
+	&pci_dev_e1000,
 	NULL,
 };
 
+pci_int_entry pci_int_entries[256];
+static void pci_irq_handler(regs_t regs);
+
 void pci_setup(void)
 {
+	puts("Resetting PCI interrupt entries\n");
+	kmemset(pci_int_entries, 0, 256 * sizeof(pci_int_entry));
+	int_regh(10, &pci_irq_handler);
 	puts("PCI enumeration...\n");
 	for(BYTE bus = 0; bus < 255; bus++)
 	{
@@ -171,4 +180,62 @@ void pci_cfg_writel(BYTE bus, BYTE dev, BYTE func, BYTE off, LONG val)
 	io_wait();
 	outl(PCI_PORT_CONF_DATA, val);
 	io_wait();
+}
+
+static void pci_irq_handler(regs_t regs)
+{
+	for(int i = 0; i < 256; i++)
+	{
+		pci_int_entry* ie = pci_int_entries + i;
+		if(ie->priv == NULL)
+		{
+			continue;
+		}
+		
+		LONG status, command, intl;
+		status = pci_cfg_read_status(ie->bus, ie->device, ie->function);
+		command = pci_cfg_read_command(ie->bus, ie->device, ie->function);
+		intl = pci_cfg_read_intl(ie->bus, ie->device, ie->function);
+		
+		if(status & 8 && !(command & 1024) && intl == regs.int_no)
+		// is interrupt status 1, are interrupts enabled, is the int line matching
+		{
+			ie->handler(regs, ie->priv);
+		}
+		else
+			continue;
+	}
+}
+
+int pci_int_request(LONG bus, LONG device, LONG func, void* dev_id, void (*handler)(regs_t regs, void* dev_id))
+{
+	for(int i = 0; i < 256; i++)
+	{
+		if(pci_int_entries[i].priv == NULL)
+		{
+			pci_int_entries[i].bus = bus;
+			pci_int_entries[i].device = device;
+			pci_int_entries[i].function = func;
+			pci_int_entries[i].priv = dev_id;
+			pci_int_entries[i].handler = handler;
+			return 0;
+		}
+	}
+	puts("[pci] out of interrupt handler entries\n");
+	return 1;
+}
+
+void pci_int_release(void* dev_id)
+{
+	for(int i = 0; i < 256; i++)
+	{
+		if(pci_int_entries[i].priv == dev_id)
+		{
+			pci_int_entries[i].priv = NULL;
+			pci_int_entries[i].bus = 0;
+			pci_int_entries[i].device = 0;
+			pci_int_entries[i].function = 0;
+			pci_int_entries[i].handler = NULL;
+		}
+	}
 }

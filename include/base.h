@@ -8,6 +8,7 @@ typedef uint16_t WORD;
 typedef uint8_t BYTE;
 typedef uint32_t LONG;
 typedef uint64_t QUAD;
+typedef uint64_t QWORD;
 
 #define PACK __attribute__((packed))
 #define ALIGN4K __attribute__((aligned(4096)))
