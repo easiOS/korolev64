@@ -16,5 +16,6 @@ file(GLOB SRC_FS	"fs/*.c")
 file(GLOB SRC_KERNC	"kernel/*.c")
 file(GLOB SRC_KERNA	"kernel/*.asm")
 file(GLOB SRC_LIBC	"libc/*.c")
+file(GLOB SRC_NET	"net/*.c")
 
-add_executable(kernel.elf ${SRC_BOOT} ${SRC_DEV} ${SRC_FS} ${SRC_KERNC} ${SRC_KERNA} ${SRC_LIBC})
+add_executable(kernel.elf ${SRC_BOOT} ${SRC_DEV} ${SRC_FS} ${SRC_KERNC} ${SRC_KERNA} ${SRC_LIBC} ${SRC_NET})
