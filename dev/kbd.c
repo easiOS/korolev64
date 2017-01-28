@@ -35,7 +35,6 @@ static void kbd_interrupt(regs_t regs)
 	BYTE scancode;
 	LONG a, spec, kc;
 	if(!(inb(0x64) & 1)) return;
-	puts("Keyboard interrupt\n");
 	scancode = inb(0x60);
 	a = inb(0x61);
 	spec = scancode == 0xE0;
@@ -78,7 +77,7 @@ static void kbd_interrupt(regs_t regs)
 
 void kbd_setup(void)
 {
-	puts("Keyboard setup...");
+	puts("[kbd] Keyboard setup...");
 	kmemset(kbd_stack, 0, 512 * sizeof(kbd_event_t));
 	// disable ports
 	kbd_ps2_cmd(0xAD);
