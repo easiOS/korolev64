@@ -18,10 +18,10 @@ static void pci_irq_handler(regs_t regs);
 
 void pci_setup(void)
 {
-	puts("Resetting PCI interrupt entries\n");
+	puts("[pci] Resetting interrupt entries\n");
 	kmemset(pci_int_entries, 0, 256 * sizeof(pci_int_entry));
-	int_regh(10, &pci_irq_handler);
-	puts("PCI enumeration...\n");
+	int_regh(IRQ10, &pci_irq_handler);
+	puts("[pci] Bus enumeration...\n");
 	for(BYTE bus = 0; bus < 255; bus++)
 	{
 		for(BYTE device = 0; device < 32; device++)
@@ -45,23 +45,29 @@ void pci_setup(void)
 					{
 						if(dev->class_code == class && dev->subclass == sclass)
 						{
-							puts("PCI device detected: \"");
+							puts("[pci] \"");
 							puts(dev->name);
-							puts("\"...");
+							puts("\"@pci://");
+							putn(bus, 16); puts(":");
+							putn(device, 16); puts(".");
+							putn(function, 16); puts("\n");
+
 							if(dev->initf)
 							{
 								if(dev->initf(bus, device, function))
 								{
-									puts("failed.\n");
+									puts("[pci] Initialization failure.\n");
+									break;
 								}
 								else
 								{
-									puts("OK.\n");
+									break;
 								}
 							}
 							else
 							{
-								puts("skipped.\n");
+								puts("[pci] Missing driver.\n");
+								break;
 							}
 						}
 					}
@@ -72,39 +78,43 @@ void pci_setup(void)
 							pci_devid_t* id = &dev->ids[i];
 							if(id->vendor == vendor && id->device == devid)
 							{
-								puts("PCI device detected: ");
+								puts("[pci] \"");
 								puts(dev->name);
-								puts("\n");
+								puts("\"@pci://");
+								putn(bus, 16); puts(":");
+								putn(device, 16); puts(".");
+								putn(function, 16); puts("\n");
+							
 								if(dev->initf)
 								{
-									puts("PCI device detected: \"");
-									puts(dev->name);
-									puts("\"...");
-									if(dev->initf)
+									if(dev->initf(bus, device, function))
 									{
-										if(dev->initf(bus, device, function))
-										{
-											puts("failed.\n");
-										}
-										else
-										{
-											puts("OK.\n");
-										}
+										puts("[pci] Initialization failure.\n");
+										break;
 									}
 									else
 									{
-										puts("skipped.\n");
+										break;
 									}
+								}
+								else
+								{
+									puts("[pci] Missing driver.\n");
 									break;
 								}
 							}
 						}
 					}
+					puts("[pci] (");
+					putn(vendor, 16); puts(":"); putn(devid, 16);
+					puts(")@pci://");
+					putn(bus, 16); puts(":");
+					putn(device, 16); puts(".");
+					putn(function, 16); puts("\n");
 				}
 			}
 		}
 	}
-	puts("PCI enumeration OK!\n");
 }
 
 BYTE pci_cfg_readb(BYTE bus, BYTE dev, BYTE func, BYTE off)
@@ -184,10 +194,11 @@ void pci_cfg_writel(BYTE bus, BYTE dev, BYTE func, BYTE off, LONG val)
 
 static void pci_irq_handler(regs_t regs)
 {
+	//puts("[pci] interrupt!\n");
 	for(int i = 0; i < 256; i++)
 	{
 		pci_int_entry* ie = pci_int_entries + i;
-		if(ie->priv == NULL)
+		if(ie->dev == NULL)
 		{
 			continue;
 		}
@@ -200,7 +211,7 @@ static void pci_irq_handler(regs_t regs)
 		if(status & 8 && !(command & 1024) && intl == regs.int_no)
 		// is interrupt status 1, are interrupts enabled, is the int line matching
 		{
-			ie->handler(regs, ie->priv);
+			ie->handler(regs, ie->dev);
 		}
 		else
 			continue;
@@ -211,12 +222,12 @@ int pci_int_request(LONG bus, LONG device, LONG func, void* dev_id, void (*handl
 {
 	for(int i = 0; i < 256; i++)
 	{
-		if(pci_int_entries[i].priv == NULL)
+		if(pci_int_entries[i].dev == NULL)
 		{
 			pci_int_entries[i].bus = bus;
 			pci_int_entries[i].device = device;
 			pci_int_entries[i].function = func;
-			pci_int_entries[i].priv = dev_id;
+			pci_int_entries[i].dev = dev_id;
 			pci_int_entries[i].handler = handler;
 			return 0;
 		}
@@ -229,9 +240,9 @@ void pci_int_release(void* dev_id)
 {
 	for(int i = 0; i < 256; i++)
 	{
-		if(pci_int_entries[i].priv == dev_id)
+		if(pci_int_entries[i].dev == dev_id)
 		{
-			pci_int_entries[i].priv = NULL;
+			pci_int_entries[i].dev = NULL;
 			pci_int_entries[i].bus = 0;
 			pci_int_entries[i].device = 0;
 			pci_int_entries[i].function = 0;

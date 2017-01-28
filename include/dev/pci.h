@@ -49,7 +49,7 @@ typedef struct {
 } pci_dev_t;
 
 typedef struct {
-	void* priv;
+	void* dev;
 	void (*handler)(regs_t regs, void* dev_id);
 	LONG bus, device, function;
 } pci_int_entry;
@@ -65,6 +65,8 @@ void pci_cfg_writel(BYTE bus, BYTE dev, BYTE func, BYTE off, LONG val);
 
 #define pci_cfg_read_status(bus, dev, func) pci_cfg_readw(bus, dev, func, PCI_CFG_STA)
 #define pci_cfg_read_command(bus, dev, func) pci_cfg_readw(bus, dev, func, PCI_CFG_CMD)
+#define pci_cfg_write_command(bus, dev, func, cmd) pci_cfg_writew(bus, dev, func, PCI_CFG_CMD, cmd)
 #define pci_cfg_read_intl(bus, dev, func) pci_cfg_readb(bus, dev, func, PCI_CFG_INT)
+#define pci_cfg_read_bar(bus, dev, func, n) pci_cfg_readl(bus, dev, func, PCI_CFG_BR0 + (n * 4))
 
 #endif /* H_DEV_PCI */
