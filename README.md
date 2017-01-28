@@ -7,12 +7,20 @@ Korolev64 is an in-development kernel for x86.
 * Partial stdlib
 * Basic filesystem (KSSFS)
 * Load and run executable
-* System calls
 * Linux userspace tools for the built-in filesystem
 
 ## Planned features
+* e1000 support
+* multiple network interfaces
+* IPv6 only network stack
+* Task switching
 * Improved KSSFS (KFS2)
 * Move filesystems and disk handling into userspace once task switching and system calls are complete
+
+## Features under testing
+* Memory manager (ported from prev-gen kernel)
+* System calls
+* Shared IRQs
 
 ## How to build
 ### Requirements:
