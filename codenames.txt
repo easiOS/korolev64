@@ -32,3 +32,5 @@ libc		/libc/*
 tools		/tools/*
 
 project		/*		(Makefile, README, etc.)
+
+init		/init/*
