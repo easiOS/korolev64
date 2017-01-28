@@ -5,7 +5,7 @@
 LONG timer;
 LONG sleepc;
 
-void timer_handler(regs_t regs)
+static void timer_handler(regs_t regs)
 {
 	timer++;
 	if(sleepc)
@@ -14,11 +14,11 @@ void timer_handler(regs_t regs)
 
 void timer_setup(void)
 {
-	puts("Timer setup...");
+	puts("[timer] Timer setup...");
 	timer = 0;
 	sleepc = 0;
 	outb(0x43, 0x36);
-	WORD divisor = 1193;
+	WORD divisor = 11931;
 	BYTE l = divisor & 0xFF;
 	BYTE h = (divisor >> 8) & 0xFF;
 	outb(0x40, l);
