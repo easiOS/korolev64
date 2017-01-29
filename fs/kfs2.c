@@ -64,7 +64,7 @@ LONG kfs2_read_byte(LONG file, BYTE* dest, LONG n, LONG off)
 {
 	LONG dest_p;
 	kfs2_file* f;
-	LONG clstr, clstr_n, t;
+	LONG clstr = 0, clstr_n, t;
 
 	dest_p = 0;
 	f = &kfs2_handles[file];

@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stddef.h>
+#include <memory.h>
 
 int atoi(const char* s)
 {
@@ -104,7 +105,16 @@ int strncmp( const char *ptr0, const char *ptr1, int len ){
   return 0;
 }
 
-void *memcpy(void *dest, const void *src, size_t n)
+void* memcpy(void* dst, const void* src, size_t n)
+{
+  BYTE* d = dst;
+  BYTE* s = src;
+  while(n--)
+    *d++ = *s++;
+  return dst;
+}
+
+void *memcpy_old(void *dest, const void *src, size_t n)
 {
   int d0,d1,d2,d3,d4,d5;
   char *ret = dest;
@@ -308,7 +318,7 @@ char *strncpy(char *dest, const char *src, size_t n)
     do {
         if (!n--)
             return ret;
-    } while (*dest++ = *src++);
+    } while ((*dest++ = *src++));
     while (n--)
         *dest++ = 0;
     return ret;

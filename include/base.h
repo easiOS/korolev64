@@ -4,6 +4,8 @@
 #include <stdint.h>
 #include <stddef.h>
 
+#undef itoa
+
 typedef uint16_t WORD;
 typedef uint8_t BYTE;
 typedef uint32_t LONG;

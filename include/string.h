@@ -12,6 +12,7 @@ unsigned strlen(char* s);
 int strncmp( const char *ptr0, const char *ptr1, int len );
 char *strncpy(char *dest, const char *src, size_t n);
 char *strncat(char *dest, const char *src, size_t n);
+void *memcpy(void *dest, const void *src, size_t n);
 
 #endif /* __linux__ */
 

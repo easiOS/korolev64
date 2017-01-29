@@ -2,6 +2,7 @@
 #include <text.h>
 #include <dev/disk.h>
 #include <fs/kssfs.h>
+#include <string.h>
 
 LONG kssfs_lba = 0;
 BYTE kssfs_buf[16384];
@@ -85,7 +86,7 @@ int kssfs_read_file(void* dest, char* filename)
 	for(int i = 0; i < kssfs_cluster_n; i++)
 	{
 		kssfs_read_cluster(i);
-		if(strncmp(kssfs_clstr->filename, filename, 256) == 0)
+		if(strncmp((char*)kssfs_clstr->filename, filename, 256) == 0)
 		{
 			memcpy(dest, kssfs_clstr->data, kssfs_clstr->len);
 			return 1;
@@ -96,5 +97,5 @@ int kssfs_read_file(void* dest, char* filename)
 
 LONG kssfs_avail(void)
 {
-	return (kssfs_buf);
+	return (LONG)kssfs_buf;
 }

@@ -1,6 +1,7 @@
 #include <base.h>
 #include <port.h>
 #include <int.h>
+#include <text.h>
 
 volatile LONG seconds;
 volatile LONG ticks;

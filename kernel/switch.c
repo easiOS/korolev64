@@ -1,6 +1,7 @@
 #include <base.h>
 #include <switch.h>
 #include <runtime.h>
+#include <string.h>
 
 proc_ctx_t switch_contexts[MAX_PROC];
 LONG switch_proc_flags[MAX_PROC];
@@ -15,13 +16,13 @@ void switch_setup(void)
 
 proc_ctx_t switch_switchnext(void)
 {
+	return switch_contexts[0]; // TODO
 	if(switch_current_ctx == (MAX_PROC - 1))
 	{
 		switch_current_ctx = 0;
 	}
 	while((switch_proc_flags[switch_current_ctx] & 1) == 0)
 	{
-		
 	}
 }
 

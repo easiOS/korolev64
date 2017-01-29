@@ -35,8 +35,8 @@ void kmain(LONG magic, LONG address)
 	kbd_setup();
 	ethernet_setup();
 	pci_setup();
-	network_setup();
 	asm volatile("sti");
+	network_setup();
 	/*if(!kssfs_avail())
 	{
 		puts("no disk available, halt\n");

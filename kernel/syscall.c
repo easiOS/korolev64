@@ -6,7 +6,7 @@
 static void syscall_handler(regs_t regs)
 {
 	//puts_int("syscall!\n");
-	LONG a, b, c, d;
+	//LONG a, b, c, d;
 	char* e;
 	kbd_event_t k;
 	switch(regs.eax)

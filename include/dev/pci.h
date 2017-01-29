@@ -56,6 +56,9 @@ typedef struct {
 
 void pci_setup(void);
 
+int pci_int_request(LONG bus, LONG device, LONG func, void* dev_id, void (*handler)(regs_t regs, void* dev_id));
+void pci_int_release(void* dev_id);
+
 BYTE pci_cfg_readb(BYTE bus, BYTE dev, BYTE func, BYTE off);
 WORD pci_cfg_readw(BYTE bus, BYTE dev, BYTE func, BYTE off);
 LONG pci_cfg_readl(BYTE bus, BYTE dev, BYTE func, BYTE off);

@@ -3,6 +3,7 @@
 #include <text.h>
 #include <int.h>
 #include <dev/kbd.h>
+#include <string.h>
 
 kbd_event_t kbd_stack[512];
 kbd_event_t* kbd_stack_sp = &kbd_stack[511];
@@ -162,6 +163,7 @@ BYTE kbd_ps2_testch(BYTE ch)
 			kbd_ps2_cmd(0xA9);
 			return kbd_ps2_read_data() == 0;
 	}
+	return 0;
 }
 
 void kbd_ps2_enable_irq(void)

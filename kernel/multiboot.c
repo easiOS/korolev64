@@ -9,7 +9,7 @@
 void cmdline_process(char* cmd)
 {
     char* cc;
-    char* arg;
+    char* arg = NULL;
 
     cc = cmd;
     do

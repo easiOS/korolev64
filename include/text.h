@@ -36,4 +36,11 @@ void upd_cur(void);
 // print number
 void putn(int n, int base);
 
+void putn2(LONG n);
+void putn10(LONG n);
+void putn16(LONG n);
+
+// puts for interrupt handlers
+void puts_int(char* s);
+
 #endif /* H_TEXT */

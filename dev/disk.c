@@ -8,6 +8,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <fs/kssfs.h>
+
 int ide_init(LONG bus, LONG device, LONG function);
 
 BYTE ide_buffer[8192];

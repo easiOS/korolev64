@@ -1,5 +1,6 @@
 #include <base.h>
 #include <port.h>
+#include <string.h>
 #include <dev/serial.h>
 
 BYTE serial_status[4];

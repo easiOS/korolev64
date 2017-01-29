@@ -3,6 +3,7 @@
 #include <port.h>
 #include <text.h>
 #include <int.h>
+#include <string.h>
 
 #include <dev/disk.h>
 #include <dev/e1000.h>
