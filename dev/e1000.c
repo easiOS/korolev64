@@ -171,7 +171,7 @@ void e1000_rxinit(ethdev* dev)
 	struct e1000_rx_desc* descs;
 
 	ptr = malloc(sizeof(struct e1000_rx_desc)*E1000_NUM_RX_DESC + 16);
-	puts("[e1000] rx buffer 0x"); putn(ptr, 16); puts("\n");
+	puts("[e1000] rx buffer\n");
 
 	descs = (struct e1000_rx_desc*)ptr;
 	for(int i = 0; i < E1000_NUM_RX_DESC; i++)
@@ -202,7 +202,7 @@ void e1000_txinit(ethdev* dev)
 	struct e1000_tx_desc* descs;
 
 	ptr = malloc(sizeof(struct e1000_tx_desc)*E1000_NUM_TX_DESC + 16);
-	puts("[e1000] tx buffer 0x"); putn(ptr, 16); puts("\n");
+	puts("[e1000] tx buffer\n");
 
 	descs = (struct e1000_tx_desc*)ptr;
 	for(int i = 0; i < E1000_NUM_TX_DESC; i++)
@@ -270,6 +270,24 @@ LONG e1000_check_link(ethdev* dev)
 	return dev->link_status = (e1000_readcmd(dev, REG_STATUS) & 2);
 }
 
+LONG e1000_is_broadcast(ethdev* dev)
+{
+	LONG rctrl = e1000_readcmd(dev, REG_RCTRL);
+	return rctrl & RCTL_BAM;
+}
+
+LONG e1000_is_multicast(ethdev* dev)
+{
+	LONG rctrl = e1000_readcmd(dev, REG_RCTRL);
+	return rctrl & RCTL_MPE;
+}
+
+LONG e1000_is_promisc(ethdev* dev)
+{
+	LONG rctrl = e1000_readcmd(dev, REG_RCTRL);
+	return rctrl & RCTL_UPE;
+}
+
 void e1000_reset(ethdev* dev)
 {
 	/*LONG pbs, pba, ctrl, status;
@@ -306,7 +324,7 @@ void e1000_receive(ethdev* dev)
 	}
 }
 
-static void e1000_handler(regs_t regs, void* dev_id)
+void e1000_handler(regs_t regs, void* dev_id)
 {
 	ethdev* dev = dev_id;
 	struct e1000_priv* p = dev->priv;
@@ -346,6 +364,7 @@ int e1000_init(LONG bus, LONG device, LONG function)
 		puts("[e1000] cannot allocate ethdev\n");
 		return 1;
 	}
+	dev->allocated = 1;
 	priv = dev->priv = malloc(sizeof(struct e1000_priv));
 
 	priv->bus = bus;
@@ -405,6 +424,10 @@ int e1000_init(LONG bus, LONG device, LONG function)
 	FLUSH_WRITE();
 
 	dev->write = &e1000_write;
+	dev->is_up = &e1000_check_link;
+	dev->is_broadcast = &e1000_is_broadcast;
+	dev->is_multicast = &e1000_is_multicast;
+	dev->is_promisc = &e1000_is_promisc;
 
 	return 0;
 }
