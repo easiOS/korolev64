@@ -3,6 +3,14 @@
 
 #define NET_MAX_IFS 16
 
+#define ETH_P_IPV6	0x86DD
+
+typedef struct {
+	BYTE dest[6];
+	BYTE src[6];
+	WORD protocol;
+} __attribute__((packed)) ethhdr;
+
 #define INET_P_TCP	0x06
 #define INET_P_UDP	0x11
 #define INET_P_ICMP	0x3A
@@ -15,6 +23,12 @@ typedef struct {
 	uint8_t nxthdr;
 	uint8_t ttl;
 } __attribute__((packed)) ip6hdr;
+
+typedef struct {
+	ethhdr* l2;
+	ip6hdr* l3;
+	void* l4;
+} network_buf;
 
 #define NET_ADDR_UNDEFINED		0
 #define NET_ADDR_IPV6			1

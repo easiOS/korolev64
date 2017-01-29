@@ -5,14 +5,6 @@
 
 #define ETH_MAX_IFS	16
 
-#define ETH_P_IPV6	0x86DD
-
-typedef struct {
-	BYTE dest[6];
-	BYTE src[6];
-	WORD protocol;
-} __attribute__((packed)) ethhdr;
-
 typedef struct ethdev ethdev;
 
 struct ethdev {
