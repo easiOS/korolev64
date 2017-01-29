@@ -10,6 +10,7 @@ unsigned strlen(char* s);
 void reverse(char* s);
 unsigned strlen(char* s);
 int strncmp( const char *ptr0, const char *ptr1, int len );
+void strncpy(char* dst, char* src, size_t n);
 
 #endif /* __linux__ */
 

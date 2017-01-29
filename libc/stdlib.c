@@ -301,3 +301,15 @@ void free(void* ptr)
   if(!ptr) return;
   mmgmt_free(ptr);
 }
+
+void strncpy(char* dst, char* src, size_t n)
+{
+  int i;
+  for(i = 0; i < n; i++)
+  {
+    if(src[i] == 0)
+      break;
+    dst[i] = src[i];
+  }
+  dst[i] = 0;
+}
