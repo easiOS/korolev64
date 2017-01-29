@@ -7,10 +7,12 @@
 
 #include <dev/disk.h>
 #include <dev/e1000.h>
+#include <dev/virtio-net.h>
 
 pci_dev_t* pci_devices[] = {
 	//&pci_dev_disk,
 	&pci_dev_e1000,
+	&pci_dev_virtio_net,
 	NULL,
 };
 
@@ -95,6 +97,7 @@ void pci_setup(void)
 									}
 									else
 									{
+										puts("[pci] OK\n");
 										break;
 									}
 								}
@@ -195,6 +198,7 @@ void pci_cfg_writel(BYTE bus, BYTE dev, BYTE func, BYTE off, LONG val)
 
 static void pci_irq_handler(regs_t regs)
 {
+	puts("[pci] int\n");
 	for(int i = 0; i < 256; i++)
 	{
 		pci_int_entry* ie = pci_int_entries + i;
