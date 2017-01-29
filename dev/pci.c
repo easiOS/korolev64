@@ -8,7 +8,7 @@
 #include <dev/e1000.h>
 
 pci_dev_t* pci_devices[] = {
-	&pci_dev_disk,
+	//&pci_dev_disk,
 	&pci_dev_e1000,
 	NULL,
 };
@@ -194,7 +194,6 @@ void pci_cfg_writel(BYTE bus, BYTE dev, BYTE func, BYTE off, LONG val)
 
 static void pci_irq_handler(regs_t regs)
 {
-	//puts("[pci] interrupt!\n");
 	for(int i = 0; i < 256; i++)
 	{
 		pci_int_entry* ie = pci_int_entries + i;
@@ -203,18 +202,11 @@ static void pci_irq_handler(regs_t regs)
 			continue;
 		}
 		
-		LONG status, command, intl;
+		/*LONG status, command, intl;
 		status = pci_cfg_read_status(ie->bus, ie->device, ie->function);
 		command = pci_cfg_read_command(ie->bus, ie->device, ie->function);
-		intl = pci_cfg_read_intl(ie->bus, ie->device, ie->function);
-		
-		if(status & 8 && !(command & 1024) && intl == regs.int_no)
-		// is interrupt status 1, are interrupts enabled, is the int line matching
-		{
-			ie->handler(regs, ie->dev);
-		}
-		else
-			continue;
+		intl = pci_cfg_read_intl(ie->bus, ie->device, ie->function);*/
+		ie->handler(regs, ie->dev);
 	}
 }
 
