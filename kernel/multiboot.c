@@ -77,7 +77,7 @@ void multiboot_process(LONG address)
             {
                 struct multiboot_tag_mmap *tagmmap = (struct multiboot_tag_mmap *)tag;
                 int mmap_n = (tagmmap->size - 16) / sizeof(struct multiboot_mmap_entry);
-                memmgmt_init(tagmmap->entries, mmap_n);
+                mmgmt_init(tagmmap->entries, mmap_n);
             }
     	}
     }
