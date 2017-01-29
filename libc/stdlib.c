@@ -108,7 +108,7 @@ int strncmp( const char *ptr0, const char *ptr1, int len ){
 void* memcpy(void* dst, const void* src, size_t n)
 {
   BYTE* d = dst;
-  BYTE* s = src;
+  BYTE* s = (void*)src;
   while(n--)
     *d++ = *s++;
   return dst;
