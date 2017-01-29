@@ -27,8 +27,9 @@
  
 #define REG_TIPG         0x0410      // Transmit Inter Packet Gap
 
-#define ECTRL_ASDE		 0x20		 // auto-speed detection
-#define ECTRL_SLU        0x40        //set link up
+#define ECTRL_ASDE	 0x20	     // auto-speed detection
+#define ECTRL_SLU        0x40        // set link up
+#define ECTRL_RST        0x4000000   // reset
  
 #define RCTL_EN                         (1 << 1)    // Receiver Enable
 #define RCTL_SBP                        (1 << 2)    // Store Bad Packets

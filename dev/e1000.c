@@ -10,6 +10,7 @@
 
 #include <text.h>
 #include <stdlib.h>
+#include <string.h>
 
 int e1000_init(LONG bus, LONG device, LONG function);
 
@@ -212,12 +213,9 @@ void e1000_txinit(ethdev* dev)
 		p->tx_descs[i]->cmd = 0;
 		p->tx_descs[i]->status = TSTA_DD;
 	}
-
 	e1000_writecmd(dev, REG_TXDESCHI, 0);
 	e1000_writecmd(dev, REG_TXDESCLO, (LONG)ptr);
-
 	e1000_writecmd(dev, REG_TXDESCLEN, E1000_NUM_TX_DESC * 16);
-
 	e1000_writecmd(dev, REG_TXDESCHEAD, 0);
 	e1000_writecmd(dev, REG_TXDESCTAIL, 0);
 	p->tx_cur = 0;
@@ -290,17 +288,29 @@ LONG e1000_is_promisc(ethdev* dev)
 
 void e1000_reset(ethdev* dev)
 {
-	/*LONG pbs, pba, ctrl, status;
-	printf("e1000: device reset\n");
+	LONG ctrl;
 
-	//note: reset delay is 20ms
+	// mask all ints
+	e1000_writecmd(dev, REG_IMASK, 0xffffffff);
+
+	// disable rx, tx
+	e1000_writecmd(dev, REG_RCTRL, 0);
+	e1000_writecmd(dev, REG_TCTRL, TCTL_PSP);
+	FLUSH_WRITE();
+
+	sleep(10);
 
 	ctrl = e1000_readcmd(dev, REG_CTRL);
-	e1000_writecmd(dev, REG_CTRL, ctrl | 0x04000000); //send reset command
-	sleep(20);
 
-	//default config
-//	ctrl |= ()*/
+	// reset controller
+	e1000_writecmd(dev, REG_CTRL, ctrl | ECTRL_RST);
+	// wait for EEPROM reload
+	sleep(5);
+
+	// mask all ints
+	e1000_writecmd(dev, REG_IMASK, 0xffffffff);
+	// clear incoming interrupts
+	e1000_readcmd(dev, CMD_ICR);
 }
 
 void e1000_receive(ethdev* dev)
@@ -328,6 +338,11 @@ void e1000_handler(regs_t regs, void* dev_id)
 {
 	ethdev* dev = dev_id;
 	LONG status = e1000_readcmd(dev, CMD_ICR);
+
+	puts("[e1000] ICR: "); putn16(status); put('\n');
+
+	if(!status)
+		return; // it wasn't our interrupt
 
 	if(status & 0x80) // receive
 	{
@@ -364,6 +379,7 @@ int e1000_init(LONG bus, LONG device, LONG function)
 	}
 	dev->allocated = 1;
 	priv = dev->priv = malloc(sizeof(struct e1000_priv));
+	kmemset(priv, 0, sizeof(struct e1000_priv));
 
 	priv->bus = bus;
 	priv->device = device;
@@ -376,11 +392,12 @@ int e1000_init(LONG bus, LONG device, LONG function)
 	
 	priv->eeprom_exists = 0;
 
+	e1000_reset(dev);
+
 	puts("[e1000] enabling busmastering\n");
 	cmd = pci_cfg_read_command(bus, device, function);
 	cmd |= (1 << 2);
 	pci_cfg_write_command(bus, device, function, cmd);
-	FLUSH_WRITE();
 
 	puts("[e1000] detecting eeprom: ");
 	puts(e1000_detect_eeprom(dev) ? "yes\n" : "no\n");
@@ -403,7 +420,6 @@ int e1000_init(LONG bus, LONG device, LONG function)
 	e1000_enable_int(dev);
 	e1000_rxinit(dev);
 	e1000_txinit(dev);
-	FLUSH_WRITE();
 
 	LONG tctl;
 	tctl = e1000_readcmd(dev, REG_TCTRL);
@@ -419,7 +435,6 @@ int e1000_init(LONG bus, LONG device, LONG function)
 	e1000_writecmd(dev, REG_RCTRL, rctl);
 
 	e1000_writecmd(dev, REG_CTRL, ECTRL_SLU | ECTRL_ASDE); //set link up, activate auto-speed detection
-	FLUSH_WRITE();
 
 	dev->write = &e1000_write;
 	dev->is_up = &e1000_check_link;
