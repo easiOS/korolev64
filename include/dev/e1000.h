@@ -50,6 +50,7 @@
 #define RCTL_CFI                        (1 << 20)   // Canonical Form Indicator Bit Value
 #define RCTL_DPF                        (1 << 22)   // Discard Pause Frames
 #define RCTL_PMCF                       (1 << 23)   // Pass MAC Control Frames
+#define RCTL_BSEX						(1 << 25)	// Buffer size extension
 #define RCTL_SECRC                      (1 << 26)   // Strip Ethernet CRC
  
 // Buffer Sizes
@@ -86,6 +87,8 @@
 #define LSTA_TU                         (1 << 3)    // Transmit Underrun
 
 #define CMD_ICR							0x000C0 // Interrupt cause read
+
+#define FLUSH_WRITE()	e1000_readcmd(dev, REG_STATUS)
 
 #define E1000_NUM_RX_DESC 32
 #define E1000_NUM_TX_DESC 8

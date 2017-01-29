@@ -169,8 +169,9 @@ void e1000_rxinit(ethdev* dev)
 	struct e1000_priv* p = dev->priv;
 	void* ptr;
 	struct e1000_rx_desc* descs;
-	puts("[e1000] setting up rx buffer\n");
+
 	ptr = malloc(sizeof(struct e1000_rx_desc)*E1000_NUM_RX_DESC + 16);
+	puts("[e1000] rx buffer 0x"); putn(ptr, 16); puts("\n");
 
 	descs = (struct e1000_rx_desc*)ptr;
 	for(int i = 0; i < E1000_NUM_RX_DESC; i++)
@@ -191,7 +192,7 @@ void e1000_rxinit(ethdev* dev)
 	e1000_writecmd(dev, REG_RXDESCHEAD, 0);
 	e1000_writecmd(dev, REG_RXDESCTAIL, E1000_NUM_RX_DESC-1);
 	p->rx_cur = 0;
-	e1000_writecmd(dev, REG_RCTRL, RCTL_EN|RCTL_SBP|RCTL_UPE|RCTL_MPE|RCTL_LBM_NONE|RTCL_RDMTS_HALF|RCTL_SECRC|RCTL_BSIZE_2048);
+	e1000_writecmd(dev, REG_RCTRL, RCTL_EN|RCTL_SBP|RCTL_UPE|RCTL_MPE|RCTL_LBM_NONE|RTCL_RDMTS_HALF|RCTL_SECRC|RCTL_BSIZE_8192|RCTL_BSEX);
 }
 
 void e1000_txinit(ethdev* dev)
@@ -199,8 +200,9 @@ void e1000_txinit(ethdev* dev)
 	void* ptr;
 	struct e1000_priv* p = dev->priv;
 	struct e1000_tx_desc* descs;
-	puts("[e1000] setting up tx buffer\n");
+
 	ptr = malloc(sizeof(struct e1000_tx_desc)*E1000_NUM_TX_DESC + 16);
+	puts("[e1000] tx buffer 0x"); putn(ptr, 16); puts("\n");
 
 	descs = (struct e1000_tx_desc*)ptr;
 	for(int i = 0; i < E1000_NUM_TX_DESC; i++)
@@ -265,7 +267,7 @@ int e1000_write(void* buf, size_t len, ethdev* dev)
 
 LONG e1000_check_link(ethdev* dev)
 {
-	return dev->link_status = e1000_readcmd(dev, REG_STATUS) & 2;
+	return dev->link_status = (e1000_readcmd(dev, REG_STATUS) & 2);
 }
 
 void e1000_reset(ethdev* dev)
@@ -294,6 +296,7 @@ void e1000_receive(ethdev* dev)
 	while((p->rx_descs[p->rx_cur]->status & 1))
 	{
 		// TODO: send packet to layer 2
+
 		puts("[e1000] packet received\n");
 
 		p->rx_descs[p->rx_cur]->status = 0;
@@ -309,9 +312,22 @@ static void e1000_handler(regs_t regs, void* dev_id)
 	struct e1000_priv* p = dev->priv;
 	LONG status = e1000_readcmd(dev, CMD_ICR);
 
-	if(status & 0x80)
+	putn(status, 16);
+	puts("\n");
+
+	if(status & 0x80) // receive
 	{
 		e1000_receive(dev);
+	}
+	else if(status & 0x04) // link status change
+	{
+		puts("[e1000] link state changed: ");
+		puts(e1000_check_link(dev) ? "up\n" : "down\n");
+	}
+	else
+	{
+		puts("[e1000] irq and don't know what to do: ");
+		putn(status, 16); puts("\n");
 	}
 }
 
@@ -347,6 +363,7 @@ int e1000_init(LONG bus, LONG device, LONG function)
 	cmd = pci_cfg_read_command(bus, device, function);
 	cmd |= (1 << 2);
 	pci_cfg_write_command(bus, device, function, cmd);
+	FLUSH_WRITE();
 
 	puts("[e1000] detecting eeprom: ");
 	puts(e1000_detect_eeprom(dev) ? "yes\n" : "no\n");
@@ -363,12 +380,13 @@ int e1000_init(LONG bus, LONG device, LONG function)
 	for(int i = 0; i<0x80; i++)
 		e1000_writecmd(dev, 0x5200 + i * 4, 0);
 
-	pci_cfg_writeb(bus, device, function, PCI_CFG_INT, 11);
+	pci_cfg_writeb(bus, device, function, PCI_CFG_INT, 10);
 	pci_int_request(bus, device, function, dev, &e1000_handler);
 
 	e1000_enable_int(dev);
 	e1000_rxinit(dev);
 	e1000_txinit(dev);
+	FLUSH_WRITE();
 
 	LONG tctl;
 	tctl = e1000_readcmd(dev, REG_TCTRL);
@@ -380,22 +398,13 @@ int e1000_init(LONG bus, LONG device, LONG function)
 	rctl = e1000_readcmd(dev, REG_RCTRL);
 	//rctl &= ~(RCTL_BSIZE_4096);
 	rctl |= (RCTL_EN | /*RCTL_UPE | RCTL_MPE |*/ RCTL_BAM | RCTL_BSIZE_8192 | RCTL_SECRC);
+	rctl = (RCTL_EN | /*RCTL_UPE | RCTL_MPE |*/ RCTL_BAM | RCTL_BSIZE_8192 | RCTL_SECRC);
 	e1000_writecmd(dev, REG_RCTRL, rctl);
 
 	e1000_writecmd(dev, REG_CTRL, ECTRL_SLU | ECTRL_ASDE); //set link up, activate auto-speed detection
-	puts("[e1000] waiting for link\n");
-	while(!e1000_check_link(dev));
+	FLUSH_WRITE();
 
 	dev->write = &e1000_write;
-
-	puts("[e1000] device ready\n");
-	puts("[e1000] MAC address: ");
-	for(int i = 0; i < 6; i++)
-	{
-		putn(dev->addr[i], 16);
-		puts(":");
-	}
-	puts("\n");
 
 	return 0;
 }
