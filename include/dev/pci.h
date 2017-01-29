@@ -22,6 +22,7 @@
 #define PCI_CFG_BR3 0x1C
 #define PCI_CFG_BR4 0x20
 #define PCI_CFG_BR5 0x24
+#define PCI_CFG_SSS 0x2E
 #define PCI_CFG_INT 0x3C
 
 // Pointer to a function with arguments: bus, device, function

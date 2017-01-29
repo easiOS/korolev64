@@ -9,6 +9,7 @@ kbd			/dev/kbd.c
 timer		/dev/timer.c
 serial		/dev/serial.c
 e1000		/dev/e1000.c
+vnet		/dev/virtio-net.c
 
 kssfs		/fs/kssfs.c
 kfs2		/fs/kfs2.c
