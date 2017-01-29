@@ -344,15 +344,15 @@ void check(void) {
 
 void memmgmt_init(struct multiboot_mmap_entry* mmap, int mmap_size)
 {
-  char b[64];
   int max = 0;
   int maxi = -1;
+  puts("[memory] Memory map:\n");
   for(int i = 0; i < mmap_size; i++)
   {
-    puts("mmap entry #"); puts(itoa(i, b, 10));
-		puts("\n    addr: 0x"); puts(itoa(mmap[i].addr, b, 16));
-		puts("\n    len:  "); puts(itoa(mmap[i].len, b, 10));
-		puts("\n    type: "); puts(itoa(mmap[i].type, b, 10)); puts("\n");
+    LONG start = mmap[i].addr;
+    LONG end = mmap[i].addr + mmap[i].len;
+    LONG type = mmap[i].type;
+    puts("[memory]     "); putn(i + 1, 10); puts(". Type: "); putn(type, 10); puts(" Range: "); putn(start, 16); puts("-0x"); putn(end, 16); puts("\n");
     if(mmap[i].len > max && mmap[i].type == MULTIBOOT_MEMORY_AVAILABLE)
     {
         max = mmap[i].len;
