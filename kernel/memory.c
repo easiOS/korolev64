@@ -42,6 +42,8 @@ void* mmgmt_alloc(size_t size)
 {
     if(mmgmt_counter >= mmgmt_len)
         return NULL;
+    if(!size)
+        return NULL;
 
     size = size + (4096 - size % 4096);
     LONG n = size >> 12;
