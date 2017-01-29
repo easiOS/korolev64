@@ -2,21 +2,27 @@
 #include <port.h>
 #include <int.h>
 
-LONG timer;
-LONG sleepc;
+volatile LONG seconds;
+volatile LONG ticks;
+volatile LONG ticks2;
 
 static void timer_handler(regs_t regs)
 {
-	timer++;
-	if(sleepc)
-		sleepc--;
+	ticks++;
+	ticks2++;
+	if(ticks == 100)
+	{
+		seconds++;
+		ticks = 0;
+	}
 }
 
 void timer_setup(void)
 {
 	puts("[timer] Timer setup...");
-	timer = 0;
-	sleepc = 0;
+	ticks = 0;
+	ticks2 = 0;
+	seconds = 0;
 	outb(0x43, 0x36);
 	WORD divisor = 11931;
 	BYTE l = divisor & 0xFF;
@@ -27,13 +33,28 @@ void timer_setup(void)
 	puts("OK!\n");
 }
 
-void sleep(LONG t)
+void __sleep(LONG ticks)
 {
-	for(int i = 0; i < t; i++)
-		cpu_relax();
+	if(!ticks2) // won't sleep without PIT
+		return;
+    volatile LONG end = ticks2 + ticks;
+    while(end > ticks2)
+    {
+        cpu_relax();
+    }
 }
 
-LONG timer_get(void)
+void sleep(LONG ticks)
 {
-	return timer;
+  __sleep(ticks);
+}
+
+LONG __ticks(void)
+{
+	return ticks2;
+}
+
+LONG time(void*p)
+{
+	return seconds;
 }

@@ -3,6 +3,7 @@
 
 void timer_setup(void);
 void sleep(LONG t);
-LONG timer_get(void);
+LONG __ticks(void);
+LONG time(void*);
 
 #endif /* H_DEV_TIMER */
