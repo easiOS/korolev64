@@ -307,6 +307,11 @@ void network_print_ipv6(netdev_addr* addr)
 			omit = 1;
 			continue;
 		}
+		if(waddr[i] == 0 && omit == 1 && i == 7)
+		{
+			put(':');
+			break;
+		}
 		if(waddr[i] == 0 && omit == 1)
 			continue;
 		if(waddr[i] != 0 && omit == 1)
