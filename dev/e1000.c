@@ -5,6 +5,7 @@
 #include <dev/pci.h>
 #include <dev/e1000.h>
 #include <net/ethernet.h>
+#include <net/network.h>
 
 #include <dev/timer.h>
 
