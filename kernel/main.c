@@ -10,6 +10,8 @@
 #include <syscall.h>
 #include <net/ethernet.h>
 
+void kshell_main(void);
+
 static void gpf(regs_t regs)
 {
 	//puts("========================\n");
@@ -43,8 +45,8 @@ void kmain(LONG magic, LONG address)
 
 	if(!kssfs_read_file(init, "init"))
 	{
-		puts("no init found, halt\n");
-		goto halt;
+		puts("no init found, kshell\n");
+		kshell_main();
 	}
 
 	puts("found init\n");
