@@ -6,8 +6,8 @@ include_directories(include)
 ENABLE_LANGUAGE(ASM)
 
 set(CMAKE_C_COMPILER i686-elf-gcc)
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D __EASIOS__ -O2 -g -std=gnu99 -ffreestanding -Wall -fdiagnostics-color=always -Wno-unused-function")
-set(CMAKE_C_LINK_EXECUTABLE "i686-elf-gcc -T ${CMAKE_SOURCE_DIR}/linker.ld -O2 -o <TARGET> -ffreestanding -nostdlib <OBJECTS>")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D __EASIOS__ -O1 -g -std=gnu99 -ffreestanding -Wall -fdiagnostics-color=always -Wno-unused-function")
+set(CMAKE_C_LINK_EXECUTABLE "i686-elf-gcc -T ${CMAKE_SOURCE_DIR}/linker.ld -O1 -o <TARGET> -ffreestanding -nostdlib <OBJECTS>")
 set(CMAKE_ASM_COMPILE_OBJECT "nasm -felf32 -o <OBJECT> <SOURCE>")
 
 file(GLOB SRC_BOOT	"boot/*.asm")

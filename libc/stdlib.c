@@ -302,14 +302,34 @@ void free(void* ptr)
   mmgmt_free(ptr);
 }
 
-void strncpy(char* dst, char* src, size_t n)
+char *strncpy(char *dest, const char *src, size_t n)
 {
-  int i;
-  for(i = 0; i < n; i++)
-  {
-    if(src[i] == 0)
-      break;
-    dst[i] = src[i];
-  }
-  dst[i] = 0;
+    char *ret = dest;
+    do {
+        if (!n--)
+            return ret;
+    } while (*dest++ = *src++);
+    while (n--)
+        *dest++ = 0;
+    return ret;
+}
+
+char *strncat(char *dest, const char *src, size_t n)
+{
+    char *ret = dest;
+    while (*dest)
+        dest++;
+    while (n--)
+        if (!(*dest++ = *src++))
+            return ret;
+    *dest = 0;
+    return ret;
+}
+
+void *kmemset(void *s, int c, size_t n)
+{
+    volatile unsigned char* p=s;
+    while(n--)
+        *p++ = (unsigned char)c;
+    return s;
 }

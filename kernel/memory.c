@@ -366,7 +366,8 @@ void memmgmt_init(struct multiboot_mmap_entry* mmap, int mmap_size)
 
 void* mmgmt_alloc(size_t size)
 {
-  return (void*)mrvn_malloc(size);
+    void* p = mrvn_malloc(size);
+    return p;
 }
 void mmgmt_free(void* ptr)
 {

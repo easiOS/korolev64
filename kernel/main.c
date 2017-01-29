@@ -9,6 +9,7 @@
 #include <dev/kbd.h>
 #include <syscall.h>
 #include <net/ethernet.h>
+#include <net/network.h>
 
 void kshell_main(void);
 
@@ -32,10 +33,11 @@ void kmain(LONG magic, LONG address)
 	syscall_setup();
 	timer_setup();
 	kbd_setup();
-	pci_setup();
 	ethernet_setup();
+	pci_setup();
+	network_setup();
 	asm volatile("sti");
-	if(!kssfs_avail())
+	/*if(!kssfs_avail())
 	{
 		puts("no disk available, halt\n");
 		goto halt;
@@ -71,6 +73,6 @@ void kmain(LONG magic, LONG address)
 
 	puts("attempted to kill init\n");
 
-	halt:
+	halt:*/
 	while(1);
 }

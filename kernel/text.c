@@ -124,7 +124,60 @@ void puts_int(char* s)
 
 void putn(int n, int base)
 {
-	char buf[32];
+	char buf[33];
 	itoa(n, buf, base);
 	puts(buf);
+}
+
+void putn2(LONG n)
+{
+	LONG s = 0;
+	LONG o = 31;
+	while(o--)
+	{
+		if((n >> o) & 1)
+		{
+			s = 1;
+			put('1');
+		}
+		else
+			if(s)
+				put('0');
+	}
+}
+
+void putn16(LONG n)
+{
+	const char* map = "0123456789abcdef";
+	LONG o = 8;
+	LONG s = 0;
+	while(o--)
+	{
+		char c = map[(n >> (o*4)) & 0xf];;
+		if(c == '0')
+		{
+			if(s)
+				put(c);
+			continue;
+		}
+		put(c);
+		s = 1;
+	}
+}
+
+void putn10(LONG n)
+{
+	char buf[33];
+	LONG i = 31;
+	LONG a;
+	while(i--)
+	{
+		a = n % 10;
+		buf[i] = '0' + a;
+		n = (n - a) / 10;
+		if(!n)
+			break;
+	}
+	buf[31] = 0;
+	puts(buf + i);
 }
