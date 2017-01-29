@@ -124,15 +124,34 @@ void puts_int(char* s)
 
 void putn(int n, int base)
 {
-	char buf[33];
+	/*char buf[33];
 	itoa(n, buf, base);
-	puts(buf);
+	puts(buf);*/ // itoa seems to be buggy
+	switch(base)
+	{
+		case 2:
+			putn2(n);
+			break;
+		case 16:
+			putn16(n);
+			break;
+		default:
+			putn10(n);
+			break;
+	}
 }
 
 void putn2(LONG n)
 {
 	LONG s = 0;
 	LONG o = 31;
+
+	if(n == 0)
+	{
+		put('0');
+		return;
+	}
+
 	while(o--)
 	{
 		if((n >> o) & 1)
@@ -151,6 +170,13 @@ void putn16(LONG n)
 	const char* map = "0123456789abcdef";
 	LONG o = 8;
 	LONG s = 0;
+
+	if(n == 0)
+	{
+		put('0');
+		return;
+	}
+
 	while(o--)
 	{
 		char c = map[(n >> (o*4)) & 0xf];;
@@ -170,6 +196,13 @@ void putn10(LONG n)
 	char buf[33];
 	LONG i = 31;
 	LONG a;
+
+	if(n == 0)
+	{
+		put('0');
+		return;
+	}
+	
 	while(i--)
 	{
 		a = n % 10;

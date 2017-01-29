@@ -308,8 +308,8 @@ void e1000_receive(ethdev* dev)
 	struct e1000_priv* p = dev->priv;
 	WORD old_cur;
 
-	BYTE* buf;
-	WORD len;
+	//BYTE* buf;
+	//WORD len;
 
 	while((p->rx_descs[p->rx_cur]->status & 1))
 	{
@@ -327,11 +327,7 @@ void e1000_receive(ethdev* dev)
 void e1000_handler(regs_t regs, void* dev_id)
 {
 	ethdev* dev = dev_id;
-	struct e1000_priv* p = dev->priv;
 	LONG status = e1000_readcmd(dev, CMD_ICR);
-
-	putn(status, 16);
-	puts("\n");
 
 	if(status & 0x80) // receive
 	{
@@ -345,7 +341,9 @@ void e1000_handler(regs_t regs, void* dev_id)
 	else
 	{
 		puts("[e1000] irq and don't know what to do: ");
-		putn(status, 16); puts("\n");
+		for(int i = 0; i < status; i++)
+			put('.');
+		puts("\n");
 	}
 }
 

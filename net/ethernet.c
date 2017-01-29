@@ -2,6 +2,7 @@
 #include <net/ethernet.h>
 #include <text.h>
 #include <string.h>
+#include <stdlib.h>
 
 ethdev* eth_ifs;
 

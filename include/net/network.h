@@ -26,6 +26,7 @@ typedef struct {
 #define NET_IF_UNDEFINED		0
 #define NET_IF_ETHERNET			1
 #define NET_IF_VSWITCH			2
+#define NET_IF_LOOPBACK			3
 
 #define NET_IF_STA_UP			(1 << 0)
 #define NET_IF_STA_BROADCAST	(1 << 1)
@@ -58,5 +59,14 @@ netdev* netdev_allocate(void);
 void netdev_free(netdev* dev);
 LONG netdev_get_status(netdev* dev);
 LONG netdev_set(netdev* dev, LONG state);
+void netdev_add_linklocal(netdev* dev);
+
+void netdev_addr_free(netdev_addr* addr);
+
+void network_create_loopback(void);
+
+void network_disable(void);
+void netdev_print(netdev* dev);
+void network_print_ipv6(netdev_addr* addr);
 
 #endif /* H_NET_INTERNET */
