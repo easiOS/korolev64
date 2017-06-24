@@ -1,6 +1,6 @@
 #include <base.h>
 #include <text.h>
-#include <dev/disk.h>
+#include <dev/ide.h>
 #include <fs/kssfs.h>
 #include <string.h>
 
@@ -97,5 +97,5 @@ int kssfs_read_file(void* dest, char* filename)
 
 LONG kssfs_avail(void)
 {
-	return (LONG)kssfs_buf;
+	return (LONG)kssfs_lba;
 }
