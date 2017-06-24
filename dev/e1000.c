@@ -6,6 +6,7 @@
 #include <dev/e1000.h>
 #include <net/ethernet.h>
 #include <net/network.h>
+#include <int.h>
 
 #include <dev/timer.h>
 
@@ -159,10 +160,16 @@ LONG e1000_read_mac(ethdev* dev)
 	return 1;
 }
 
-void e1000_enable_int(ethdev* dev)
+void e1000_enable_int_old(ethdev* dev)
 {
 	e1000_writecmd(dev, REG_IMASK, 0x1f6dc);
 	e1000_writecmd(dev, REG_IMASK, 0xff & ~4);
+	e1000_readcmd(dev, 0xc0);
+}
+
+void e1000_enable_int(ethdev* dev)
+{
+	e1000_writecmd(dev, REG_IMASK, 0x1f6dc);
 	e1000_readcmd(dev, 0xc0);
 }
 
@@ -370,6 +377,57 @@ int e1000_init(LONG bus, LONG device, LONG function)
 	LONG bar0;
 	WORD cmd;
 
+	dev = ethernet_allocate();
+	if(!dev)
+	{
+		puts("[e1000] cannot allocate ethdev\n");
+		return 1;
+	}
+	dev->allocated = 1;
+	priv = dev->priv = malloc(sizeof(struct e1000_priv));
+	kmemset(priv, 0, sizeof(struct e1000_priv));
+	puts("alloc\n");
+
+	priv->bus = bus;
+	priv->device = device;
+	priv->function = function;
+
+	bar0 = pci_cfg_read_bar(bus, device, function, 0);
+	priv->bar_type = bar0 & 1;
+	priv->memory = bar0 & 0xFFFFFFF0;
+	priv->iobase = bar0 & 0xFFFFFFFC;
+	puts("addr\n");
+
+	pci_cfg_writeb(bus, device, function, PCI_CFG_INT, IRQ10);
+	pci_int_request(bus, device, function, dev, &e1000_handler);
+	puts("int reg\n");
+
+	if(!e1000_read_mac(dev))
+	{
+		puts("[e1000] cannot read MAC addr\n");
+		free(priv);
+		ethernet_free(dev);
+		return 1;
+	}
+
+	puts("mac\n");
+
+	e1000_writecmd(dev, REG_CTRL, e1000_readcmd(dev, REG_CTRL) | ECTRL_SLU /*| ECTRL_ASDE*/); //set link up, activate auto-speed detection
+	puts("link\n");
+
+	e1000_enable_int(dev);
+	puts("int en\n");
+
+	return 0;
+}
+
+int e1000_init_old(LONG bus, LONG device, LONG function)
+{
+	ethdev* dev;
+	struct e1000_priv* priv;
+	LONG bar0;
+	WORD cmd;
+
 	puts("[e1000] Initialization\n");
 
 	dev = ethernet_allocate();
@@ -393,7 +451,7 @@ int e1000_init(LONG bus, LONG device, LONG function)
 	
 	priv->eeprom_exists = 0;
 
-	e1000_reset(dev);
+	//e1000_reset(dev);
 
 	puts("[e1000] enabling busmastering\n");
 	cmd = pci_cfg_read_command(bus, device, function);
@@ -415,7 +473,7 @@ int e1000_init(LONG bus, LONG device, LONG function)
 	for(int i = 0; i<0x80; i++)
 		e1000_writecmd(dev, 0x5200 + i * 4, 0);
 
-	pci_cfg_writeb(bus, device, function, PCI_CFG_INT, 10);
+	pci_cfg_writeb(bus, device, function, PCI_CFG_INT, IRQ10);
 	pci_int_request(bus, device, function, dev, &e1000_handler);
 
 	e1000_enable_int(dev);

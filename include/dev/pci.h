@@ -72,5 +72,7 @@ void pci_cfg_writel(BYTE bus, BYTE dev, BYTE func, BYTE off, LONG val);
 #define pci_cfg_write_command(bus, dev, func, cmd) pci_cfg_writew(bus, dev, func, PCI_CFG_CMD, cmd)
 #define pci_cfg_read_intl(bus, dev, func) pci_cfg_readb(bus, dev, func, PCI_CFG_INT)
 #define pci_cfg_read_bar(bus, dev, func, n) pci_cfg_readl(bus, dev, func, PCI_CFG_BR0 + (n * 4))
+#define pci_cfg_read_pif(bus, dev, func) pci_cfg_readb(bus, dev, func, PCI_CFG_PIF)
+#define pci_cfg_write_intl(bus, dev, func, val) pci_cfg_writeb(bus, dev, func, PCI_CFG_INT, val)
 
 #endif /* H_DEV_PCI */

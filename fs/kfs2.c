@@ -1,6 +1,6 @@
 #include <base.h>
 #include <text.h>
-#include <dev/disk.h>
+#include <dev/ide.h>
 #include <fs/kfs2.h>
 #include <stdlib.h>
 #include <string.h>

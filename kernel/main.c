@@ -37,7 +37,7 @@ void kmain(LONG magic, LONG address)
 	pci_setup();
 	asm volatile("sti");
 	network_setup();
-	/*if(!kssfs_avail())
+	if(!kssfs_avail())
 	{
 		puts("no disk available, halt\n");
 		goto halt;
@@ -73,6 +73,6 @@ void kmain(LONG magic, LONG address)
 
 	puts("attempted to kill init\n");
 
-	halt:*/
+	halt:
 	while(1);
 }

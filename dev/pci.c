@@ -5,14 +5,14 @@
 #include <int.h>
 #include <string.h>
 
-#include <dev/disk.h>
+#include <dev/ide.h>
 #include <dev/e1000.h>
 #include <dev/virtio-net.h>
 
 pci_dev_t* pci_devices[] = {
-	//&pci_dev_disk,
-	&pci_dev_e1000,
-	&pci_dev_virtio_net,
+	&pci_dev_disk,
+	//&pci_dev_e1000,
+	//&pci_dev_virtio_net,
 	NULL,
 };
 
@@ -38,6 +38,9 @@ void pci_setup(void)
 				WORD devid = pci_cfg_readw(bus, device, function, PCI_CFG_DEV);
 				BYTE class = pci_cfg_readb(bus, device, function, PCI_CFG_CLA);
 				BYTE sclass = pci_cfg_readb(bus, device, function, PCI_CFG_SCL);
+
+				if(devid == 0x0000 || devid == 0xffff)
+					continue;
 
 				for(int j = 0; j < 256; j++)
 				{
